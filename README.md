@@ -55,14 +55,14 @@ Karnataka's farmers make three critical decisions every season — *what to plan
 │   React + Vite   │  Express.js API  │  Telegram Bot (Py)   │
 │   TailwindCSS    │  Supabase Auth   │  @Kisaan1207bot      │
 │   Recharts       │  PostgreSQL+RLS  │  Multilingual        │
-│   React Router   │  Groq LLM        │  EN / KN / HI        │
+│   React Router   │  Gemini 1.5 AI   │  Multilingual        │
 └───────┬──────────┴────────┬─────────┴──────────┬────────────┘
         │                   │                    │
         ▼                   ▼                    ▼
    ┌─────────┐      ┌──────────────┐     ┌──────────────┐
-   │ Browser │      │  Open-Meteo  │     │  Groq AI     │
-   │         │      │  Nominatim   │     │  LLaMA 3.3   │
-   │         │      │  Unsplash    │     │  70B          │
+   │ Browser │      │  Open-Meteo  │     │  Gemini AI   │
+   │         │      │  Nominatim   │     │  1.5 Flash   │
+   │         │      │  Unsplash    │     │              │
    │         │      │  Overpass    │     │              │
    └─────────┘      └──────────────┘     └──────────────┘
 ```
@@ -76,7 +76,7 @@ Karnataka's farmers make three critical decisions every season — *what to plan
 | 🎨 | **React 18** · Vite · Tailwind CSS | Frontend SPA with responsive UI |
 | ⚙️ | **Node.js** · Express.js | REST API backend |
 | 🗄️ | **Supabase** (PostgreSQL + Auth + RLS) | Database, authentication, row-level security |
-| 🤖 | **Groq** — LLaMA 3.3 70B Versatile | AI crop analysis & recommendations |
+| 🤖 | **Gemini** — 1.5 Flash | AI crop analysis & recommendations |
 | 🌦️ | **Open-Meteo** | Real-time weather + 30-day history |
 | 📍 | **Nominatim** · Overpass | Geocoding + local buyer spatial queries |
 | 📸 | **Unsplash API** | Dynamic crop photography |
@@ -108,7 +108,7 @@ Create `fasal/backend/.env`:
 ```env
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_KEY=your_service_key
-GROQ_API_KEY=your_groq_key
+GEMINI_API_KEY=your_gemini_key
 UNSPLASH_ACCESS_KEY=your_unsplash_key
 PORT=3001
 ```
