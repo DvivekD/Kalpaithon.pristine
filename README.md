@@ -270,7 +270,7 @@ season_history      →  Historical data powering AI memory
 
 ### 🏆 Built at Kalpaithon 2026
 
-*24 hours · 2 people · One mission: make Indian farming data-driven.*
+*24 hours · 3 people · One mission: make Indian farming data-driven.*
 
 <br/>
 
