@@ -258,10 +258,11 @@ season_history      →  Historical data powering AI memory
 
 ## 👥 Team
 
-| Name | Role |
+| Name | USN |
 |:---|:---|
-| **Vivek D** | Full-stack · AI Integration |
-| **Team Member** | Backend · Telegram Bot |
+| **Sai Vivek K N** | 1KI25CS102 |
+| **Sohan TS** | 1KI25CS114 |
+| **Vishnu TN** | 1KI25CS135 |
 
 ---
 
