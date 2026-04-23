@@ -55,13 +55,13 @@ Karnataka's farmers make three critical decisions every season — *what to plan
 │   React + Vite   │  Express.js API  │  Telegram Bot (Py)   │
 │   TailwindCSS    │  Supabase Auth   │  @Kisaan1207bot      │
 │   Recharts       │  PostgreSQL+RLS  │  Multilingual        │
-│   React Router   │  Gemini 1.5 AI   │  Multilingual        │
+│   React Router   │  Gemini 2.5 AI   │  Multilingual        │
 └───────┬──────────┴────────┬─────────┴──────────┬────────────┘
         │                   │                    │
         ▼                   ▼                    ▼
    ┌─────────┐      ┌──────────────┐     ┌──────────────┐
    │ Browser │      │  Open-Meteo  │     │  Gemini AI   │
-   │         │      │  Nominatim   │     │  1.5 Flash   │
+   │         │      │  Nominatim   │     │  2.5 Flash   │
    │         │      │  Unsplash    │     │              │
    │         │      │  Overpass    │     │              │
    └─────────┘      └──────────────┘     └──────────────┘
@@ -76,7 +76,7 @@ Karnataka's farmers make three critical decisions every season — *what to plan
 | 🎨 | **React 18** · Vite · Tailwind CSS | Frontend SPA with responsive UI |
 | ⚙️ | **Node.js** · Express.js | REST API backend |
 | 🗄️ | **Supabase** (PostgreSQL + Auth + RLS) | Database, authentication, row-level security |
-| 🤖 | **Gemini** — 1.5 Flash | AI crop analysis & recommendations |
+| 🤖 | **Gemini** — 2.5 Flash | AI crop analysis & recommendations |
 | 🌦️ | **Open-Meteo** | Real-time weather + 30-day history |
 | 📍 | **Nominatim** · Overpass | Geocoding + local buyer spatial queries |
 | 📸 | **Unsplash API** | Dynamic crop photography |
