@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({ 
-  baseURL: import.meta.env.VITE_API_URL || 'https://backend-weld-five-81.vercel.app'
+  baseURL: import.meta.env.VITE_API_URL || 'https://backend-weld-five-81.vercel.app/api'
 });
 
 // Attach token to every request

@@ -36,7 +36,7 @@ async function createPolygon(lat, lon) {
        }
     }
   };
-  const response = await axios.post(`http://api.agromonitoring.com/agro/1.0/polygons?appid=${AGROMONITORING_API_KEY}`, polygon);
+  const response = await axios.post(`https://api.agromonitoring.com/agro/1.0/polygons?appid=${AGROMONITORING_API_KEY}`, polygon, { timeout: 5000 });
   return response.data.id;
 }
 
@@ -59,11 +59,11 @@ async function fetchRealSatelliteData(lat, lon, plantingDate) {
     const end = Math.floor(Date.now() / 1000);
 
     // 1. Fetch NDVI History
-    const ndviResponse = await axios.get(`http://api.agromonitoring.com/agro/1.0/ndvi/history?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`);
+    const ndviResponse = await axios.get(`https://api.agromonitoring.com/agro/1.0/ndvi/history?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 5000 });
     const ndviData = ndviResponse.data.sort((a, b) => a.dt - b.dt);
 
     // 2. Fetch Imagery Metadata
-    const imgResponse = await axios.get(`http://api.agromonitoring.com/agro/1.0/image/search?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`);
+    const imgResponse = await axios.get(`https://api.agromonitoring.com/agro/1.0/image/search?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 5000 });
     const imgData = imgResponse.data.sort((a, b) => a.dt - b.dt);
 
     if (ndviData.length === 0) {
@@ -106,8 +106,8 @@ async function fetchRealSatelliteData(lat, lon, plantingDate) {
         phase: `Live Satellite Pass (W${week})`,
         date: date.toISOString().split('T')[0],
         week: week,
-        ndvi_url: img.image.ndvi,
-        true_color_url: img.image.truecolor,
+        ndvi_url: (img.image.ndvi || '').replace('http://', 'https://'),
+        true_color_url: (img.image.truecolor || '').replace('http://', 'https://'),
         ndvi_range: 'Real Time'
       });
     }
