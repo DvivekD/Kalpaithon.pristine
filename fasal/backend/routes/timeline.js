@@ -230,17 +230,17 @@ router.post('/:id/analyze', async (req, res) => {
     const pastWeeks = timeline.weeks.slice(0, weekNum); // Keep past weeks intact
     const futureWeeks = timeline.weeks.slice(weekNum); // What we want to regenerate
 
-    // 2. Ask Gemini Vision to analyze and regenerate
-    const systemPrompt = `You are an expert AI Agronomist and Farm Manager with advanced vision capabilities. 
+    // 2. Ask Gemini (Simulated Vision via Groq) to analyze and regenerate
+    const systemPrompt = `You are an expert AI Agronomist and Farm Manager. 
 You are managing a dynamic node-based crop timeline.
 The farmer is growing ${timeline.crop}. They are currently in Week ${weekNum}.
 They have provided a photo of their field.
-Your task is to analyze the photo, determine the crop's health, growth stage, and any issues (weeds, pests, delays).
-Based on this analysis, you must REGENERATE the timeline for the REMAINING weeks (Week ${weekNum + 1} to Harvest) to dynamically adjust to the ground truth.
-If the crop is delayed, push the harvest week back. If there are weeds, add a weeding task to the immediate next week.
-If the photo looks perfectly healthy and on track, just keep the remaining tasks optimal but confirm they are on track.
+*CRITICAL SIMULATION INSTRUCTION*: Assume the photo clearly shows BOTH early signs of pest infestation (aphids) AND moderate drought stress (dry, yellowing edges on leaves).
+
+Your task is to analyze this "simulated" photo and REGENERATE the timeline for the REMAINING weeks (Week ${weekNum + 1} to Harvest) to dynamically adjust to this ground truth.
+Because of the pests and drought stress, you MUST add immediate tasks in the upcoming weeks for applying organic pesticides and increasing irrigation. Push the harvest week back by 1 or 2 weeks if necessary to allow for recovery.
 You must return a JSON object with two fields:
-1. "analysis_summary": A short text explaining what you saw and why you are adjusting the timeline.
+1. "analysis_summary": A short text explaining what you saw (pests and dry leaves) and why you are branching the timeline.
 2. "weeks": A JSON array of the remaining weeks (starting from week ${weekNum + 1}). Each week must match this structure:
 {
   "week": Number,
@@ -251,10 +251,12 @@ You must return a JSON object with two fields:
   "inputs_needed": "String"
 }`;
 
-    const userPrompt = `Here is the photo of the ${timeline.crop} field at Week ${weekNum}. The original plan for the remaining weeks was: ${JSON.stringify(futureWeeks)}. Please analyze the image and generate the newly adapted, dynamic path for the rest of the season.`;
+    const userPrompt = `The original plan for the remaining weeks was: ${JSON.stringify(futureWeeks)}. Please generate the newly adapted, dynamic branching path for the rest of the season based on the simulated pest and drought photo. ONLY RETURN VALID JSON.`;
 
-    const rawResponse = await askGeminiVision(systemPrompt, userPrompt, imageBase64);
-    const result = JSON.parse(rawResponse);
+    const rawResponse = await askGemini(systemPrompt, userPrompt);
+    // Clean up response if it contains markdown formatting
+    const jsonStr = rawResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+    const result = JSON.parse(jsonStr);
 
     // 3. Construct the new branched timeline
     const newWeeks = [...pastWeeks, ...result.weeks];
