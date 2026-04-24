@@ -17,8 +17,9 @@ dotenv.config();
 const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://frontend-eight-rho-94.vercel.app',
   'https://frontend-7frrkswbq-reis-projects-8a085d28.vercel.app',
-  'https://frontend-ddsj1nyqt-reis-projects-8a085d28.vercel.app',
+  'https://frontend-cbt2x4zv2-reis-projects-8a085d28.vercel.app',
   'http://localhost:5173',
   'http://localhost:5174',
 ].filter(Boolean);
@@ -36,6 +37,7 @@ app.use(express.json());
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+app.post('/test', (req, res) => res.json({ body: req.body }));
 
 // Auth middleware — extracts user_id from Supabase JWT
 async function authMiddleware(req, res, next) {
