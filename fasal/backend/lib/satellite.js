@@ -11,7 +11,7 @@ import axios from 'axios';
  * to connect to Planet/Sentinel Hub/Copernicus APIs.
  */
 
-const USE_REAL_API = true;
+const USE_REAL_API = false;
 const AGROMONITORING_API_KEY = '2d7bae6fdb15f09325729937c60a1e8e';
 
 // Helper to create polygon in Agromonitoring
@@ -212,10 +212,10 @@ function getSatelliteImageURLs(lat, lon, plantingDate, totalWeeks) {
   
   // Map each growth phase to a local NDVI satellite image
   const phases = [
-    { label: 'Pre-Planting', weekOffset: -1,                              image: '/satellite/ndvi_preplanting.png', ndvi_range: '0.08–0.15' },
-    { label: 'Early Growth',  weekOffset: Math.round(totalWeeks * 0.25),  image: '/satellite/ndvi_earlygrowth.png', ndvi_range: '0.30–0.50' },
-    { label: 'Peak Canopy',   weekOffset: Math.round(totalWeeks * 0.55),  image: '/satellite/ndvi_peakcanopy.png',  ndvi_range: '0.70–0.88' },
-    { label: 'Pre-Harvest',   weekOffset: Math.round(totalWeeks * 0.85),  image: '/satellite/ndvi_preharvest.png',  ndvi_range: '0.45–0.65' }
+    { label: 'Pre-Planting', weekOffset: -1,                              ndvi_img: '/satellite/ndvi_preplanting.png', true_img: '/satellite/truecolor_preplanting.png', ndvi_range: '0.08–0.15' },
+    { label: 'Early Growth',  weekOffset: Math.round(totalWeeks * 0.25),  ndvi_img: '/satellite/ndvi_earlygrowth.png', true_img: '/satellite/truecolor_earlygrowth.png', ndvi_range: '0.30–0.50' },
+    { label: 'Peak Canopy',   weekOffset: Math.round(totalWeeks * 0.55),  ndvi_img: '/satellite/ndvi_peakcanopy.png',  true_img: '/satellite/truecolor_peakcanopy.png',  ndvi_range: '0.70–0.88' },
+    { label: 'Pre-Harvest',   weekOffset: Math.round(totalWeeks * 0.85),  ndvi_img: '/satellite/ndvi_preharvest.png',  true_img: '/satellite/truecolor_preharvest.png',  ndvi_range: '0.45–0.65' }
   ];
 
   for (const phase of phases) {
@@ -227,8 +227,8 @@ function getSatelliteImageURLs(lat, lon, plantingDate, totalWeeks) {
       phase: phase.label,
       date: dateStr,
       week: Math.max(1, phase.weekOffset + 1),
-      ndvi_url: phase.image,
-      true_color_url: phase.image,
+      ndvi_url: phase.ndvi_img,
+      true_color_url: phase.true_img,
       ndvi_range: phase.ndvi_range
     });
   }
