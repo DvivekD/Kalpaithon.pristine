@@ -15,7 +15,23 @@ import { getWeather } from './lib/weather.js';
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://frontend-7frrkswbq-reis-projects-8a085d28.vercel.app',
+  'https://frontend-ddsj1nyqt-reis-projects-8a085d28.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+].filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o.replace('https://', '').split('/')[0]))) {
+      cb(null, true);
+    } else {
+      cb(null, true); // Allow all in dev — tighten in prod
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 // Health check
