@@ -58,12 +58,12 @@ async function fetchRealSatelliteData(lat, lon, plantingDate) {
     const start = Math.floor((plantDateMs - (30 * 24 * 60 * 60 * 1000)) / 1000);
     const end = Math.floor(Date.now() / 1000);
 
-    // 1. Fetch NDVI History
-    const ndviResponse = await axios.get(`https://api.agromonitoring.com/agro/1.0/ndvi/history?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 5000 });
+    // Fetch NDVI History + Imagery in PARALLEL to stay within Vercel's 10s limit
+    const [ndviResponse, imgResponse] = await Promise.all([
+      axios.get(`https://api.agromonitoring.com/agro/1.0/ndvi/history?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 7000 }),
+      axios.get(`https://api.agromonitoring.com/agro/1.0/image/search?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 7000 })
+    ]);
     const ndviData = ndviResponse.data.sort((a, b) => a.dt - b.dt);
-
-    // 2. Fetch Imagery Metadata
-    const imgResponse = await axios.get(`https://api.agromonitoring.com/agro/1.0/image/search?polyid=${polyId}&start=${start}&end=${end}&appid=${AGROMONITORING_API_KEY}`, { timeout: 5000 });
     const imgData = imgResponse.data.sort((a, b) => a.dt - b.dt);
 
     if (ndviData.length === 0) {
