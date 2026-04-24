@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({ 
-  baseURL: import.meta.env.VITE_API_URL || '/api' 
+  baseURL: import.meta.env.VITE_API_URL || 'https://backend-weld-five-81.vercel.app'
 });
 
 // Attach token to every request
@@ -11,9 +11,9 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// On 401, redirect to login
+// On 401, only redirect if we have a stored token (session expired)
 api.interceptors.response.use(res => res, err => {
-  if (err.response?.status === 401) {
+  if (err.response?.status === 401 && localStorage.getItem('fasal_token')) {
     localStorage.removeItem('fasal_token');
     window.location.href = '/login';
   }
