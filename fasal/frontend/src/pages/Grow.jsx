@@ -232,6 +232,8 @@ export default function Grow() {
         });
         if (res.data.success) {
           setTimeline(prev => ({ ...prev, ...res.data.timeline }));
+          // Instantly snap the UI to the newly generated branch node!
+          setDisplayWeekNum(weekNum + 1);
         }
       } catch (err) {
         alert("Failed to analyze image with AI: " + (err.response?.data?.error || err.message));
