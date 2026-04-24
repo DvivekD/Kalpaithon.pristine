@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, Check, ChevronRight, ChevronDown, ChevronUp, CloudRain, PartyPopper, Loader2, Satellite, TrendingUp, Eye } from 'lucide-react';
+import { AlertTriangle, Check, ChevronRight, ChevronDown, ChevronUp, CloudRain, PartyPopper, Loader2, Satellite, TrendingUp, Eye, Camera, Sprout } from 'lucide-react';
 import api from '../lib/api';
 import HarvestReadinessCard from '../components/HarvestReadinessCard';
 
@@ -203,6 +203,26 @@ export default function Grow() {
   const [showSatelliteData, setShowSatelliteData] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [sendingSms, setSendingSms] = useState(false);
+  const [weekPhotos, setWeekPhotos] = useState({});
+
+  useEffect(() => {
+    if (timeline?.id) {
+      const saved = localStorage.getItem(`fasal_photos_${timeline.id}`);
+      if (saved) setWeekPhotos(JSON.parse(saved));
+    }
+  }, [timeline?.id]);
+
+  const handlePhotoUpload = (weekNum, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newPhotos = { ...weekPhotos, [weekNum]: reader.result };
+      setWeekPhotos(newPhotos);
+      if (timeline?.id) localStorage.setItem(`fasal_photos_${timeline.id}`, JSON.stringify(newPhotos));
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     Promise.all([
@@ -416,9 +436,39 @@ export default function Grow() {
           {displayWeekData.inputs_needed && (
             <span className="inline-block bg-amber/20 border border-amber/30 text-amber text-xs font-medium px-3 py-1 rounded-full">Inputs: {displayWeekData.inputs_needed}</span>
           )}
+
+          {/* User Photo Upload Section */}
+          <div className="mt-4 p-4 bg-white/5 border border-white/10 rounded-xl">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Camera size={16} className="text-green-primary" /> 
+                Field Update
+              </h3>
+            </div>
+            
+            {weekPhotos[displayWeekNum] ? (
+              <div className="relative group rounded-lg overflow-hidden border border-white/10">
+                <img src={weekPhotos[displayWeekNum]} alt={`Week ${displayWeekNum} field`} className="w-full h-48 object-cover" />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                  <label className="cursor-pointer bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors border border-white/20">
+                    Replace Photo
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoUpload(displayWeekNum, e)} />
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 hover:border-green-primary/50 rounded-lg cursor-pointer bg-black/20 hover:bg-white/5 transition-all group">
+                <Camera className="text-text-secondary group-hover:text-green-primary mb-2 transition-colors" size={24} />
+                <span className="text-sm font-semibold text-text-secondary group-hover:text-white transition-colors">Upload photo for Week {displayWeekNum}</span>
+                <span className="text-[10px] text-text-secondary/50 mt-1">PNG, JPG up to 5MB</span>
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoUpload(displayWeekNum, e)} />
+              </label>
+            )}
+          </div>
+
           {displayWeekNum === current && (
             <button onClick={advance} disabled={advancing}
-              className="mt-2 glass-button px-6 py-2.5 text-sm font-semibold rounded-lg disabled:opacity-50">
+              className="mt-2 w-full glass-button px-6 py-2.5 text-sm font-semibold rounded-lg disabled:opacity-50">
               {advancing ? 'Advancing...' : 'Mark this week complete ✓'}
             </button>
           )}
