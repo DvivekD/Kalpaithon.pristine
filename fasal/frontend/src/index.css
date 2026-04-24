@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-green-primary: #059669; /* Emerald 600 */
+  --color-green-dark: #047857; /* Emerald 700 */
+  --color-green-light: rgba(5, 150, 105, 0.15);
+  --color-charcoal: #1E2D2F;
+  
+  --color-amber: #F59E0B;
+  --color-amber-light: rgba(245, 158, 11, 0.15);
+  
+  --color-coral: #EF4444;
+  --color-coral-light: rgba(239, 68, 68, 0.15);
+  
+  /* Premium Dark Mode Base */
+  --color-bg-primary: #070B0D;
+  --color-bg-card: #0D1517;
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-text-primary: #F3F4F6;
+  --color-text-secondary: #8B9D96;
+  
+  --color-success: #1D9E75;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  --font-sans: 'Inter', 'Helvetica', 'Arial', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Global form element dark mode fix — prevents white-on-white anywhere */
+input, select, textarea {
+  color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.2);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--color-text-secondary);
+}
+option {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+}
+/* Date input icon fix for dark mode */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+/* Animated circular ring for success scores */
+@keyframes ring-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+.success-ring circle.fill {
+  animation: ring-fill 1.2s ease-out forwards;
+}
+
+/* Score gauge needle */
+@keyframes needle-swing {
+  from { transform: rotate(-90deg); }
+}
+
+.gauge-needle {
+  transform-origin: center bottom;
+  animation: needle-swing 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stage progress connector */
+.stage-pill {
+  @apply px-4 py-2 text-sm font-semibold rounded-full transition-all;
+}
+.stage-pill.active {
+  @apply bg-green-primary text-white;
+}
+.stage-pill.locked {
+  @apply bg-gray-200 text-gray-400;
+}
+.stage-pill.completed {
+  @apply bg-green-light text-green-dark;
+}
+
+/* Data card left accent border - Dark Mode Refined */
+.accent-card {
+  @apply border-l-4 rounded-xl bg-bg-card shadow-lg border border-white/5;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.accent-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+.accent-card.green { border-left-color: var(--color-green-primary); }
+.accent-card.amber { border-left-color: var(--color-warning); }
+.accent-card.coral { border-left-color: var(--color-danger); }
+
+/* Premium Glassmorphic Utilities - Refined to look professional, not 'vibe coded' */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.005));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.glass-button {
+  @apply transition-all duration-300;
+  background: rgba(29, 158, 117, 0.1);
+  border: 1px solid rgba(29, 158, 117, 0.3);
+  color: var(--color-green-primary);
+}
+.glass-button:hover {
+  background: rgba(29, 158, 117, 0.2);
+  border-color: rgba(29, 158, 117, 0.5);
+  box-shadow: 0 0 15px rgba(29, 158, 117, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Leaflet fix */
+.leaflet-container { height: 100%; width: 100%; z-index: 1; }
+
+/* iOS PWA Safe Area Utilities */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .pt-safe-top { padding-top: max(1rem, env(safe-area-inset-top)); }
+  .pb-safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+}
+
+/* Landing Page Bubble Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 40px 10px rgba(29, 158, 117, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+  50% { box-shadow: 0 0 60px 20px rgba(29, 158, 117, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.4); }
+}
+
+.glass-bubble {
+  animation: float 6s ease-in-out infinite, pulse-glow 4s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 15s infinite alternate;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Premium Page Transitions */
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.page-transition {
+  animation: page-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  will-change: opacity, transform;
+}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Google Translate Hidden UI Fixes */
+.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+.goog-tooltip {
+  display: none !important;
+}
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important; 
+  box-shadow: none !important;
+}
+#google_translate_element {
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+}

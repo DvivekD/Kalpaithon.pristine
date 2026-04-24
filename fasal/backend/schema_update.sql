@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS harvest_readiness (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES farmer_profiles(id),
+  timeline_id UUID REFERENCES grow_timelines(id),
+  crop_type TEXT,
+  sowing_date DATE,
+  readiness_score INT,
+  window_start_days INT,
+  window_end_days INT,
+  confidence TEXT,
+  trend TEXT,
+  explanation TEXT,
+  current_ndvi FLOAT,
+  peak_ndvi FLOAT,
+  days_since_peak INT,
+  observations_used INT,
+  fallback_used BOOLEAN DEFAULT FALSE,
+  reliability_note TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);

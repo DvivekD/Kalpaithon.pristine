@@ -1,0 +1,12 @@
+[
+  {"name":"Kolar APMC","district":"Kolar","lat":13.136,"lon":78.129,"crops":["Tomato","Onion","Ragi"]},
+  {"name":"Bangalore APMC Yeshwanthpur","district":"Bengaluru Urban","lat":13.028,"lon":77.555,"crops":["Tomato","Onion","Potato","Cabbage","Brinjal"]},
+  {"name":"Chintamani APMC","district":"Chikkaballapur","lat":13.401,"lon":78.053,"crops":["Tomato","Ragi","Groundnut"]},
+  {"name":"Hubli APMC","district":"Dharwad","lat":15.36,"lon":75.12,"crops":["Groundnut","Cotton","Onion","Jowar"]},
+  {"name":"Davangere APMC","district":"Davangere","lat":14.467,"lon":75.919,"crops":["Maize","Ragi","Sunflower","Paddy"]},
+  {"name":"Mysuru APMC","district":"Mysuru","lat":12.295,"lon":76.639,"crops":["Ragi","Maize","Onion","Turmeric"]},
+  {"name":"Tumkur APMC","district":"Tumkur","lat":13.342,"lon":77.101,"crops":["Groundnut","Onion","Maize","Ragi"]},
+  {"name":"Belagavi APMC","district":"Belagavi","lat":15.849,"lon":74.499,"crops":["Sugarcane","Soybean","Groundnut"]},
+  {"name":"Raichur APMC","district":"Raichur","lat":16.212,"lon":77.356,"crops":["Cotton","Jowar","Groundnut","Maize"]},
+  {"name":"Hassan APMC","district":"Hassan","lat":13.006,"lon":76.099,"crops":["Potato","Cabbage","Ragi","Maize"]}
+]
