@@ -204,6 +204,7 @@ export default function Grow() {
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [sendingSms, setSendingSms] = useState(false);
   const [weekPhotos, setWeekPhotos] = useState({});
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
     if (timeline?.id) {
@@ -212,14 +213,30 @@ export default function Grow() {
     }
   }, [timeline?.id]);
 
-  const handlePhotoUpload = (weekNum, e) => {
+  const handlePhotoUpload = async (weekNum, e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onloadend = () => {
-      const newPhotos = { ...weekPhotos, [weekNum]: reader.result };
+    reader.onloadend = async () => {
+      const base64 = reader.result;
+      const newPhotos = { ...weekPhotos, [weekNum]: base64 };
       setWeekPhotos(newPhotos);
       if (timeline?.id) localStorage.setItem(`fasal_photos_${timeline.id}`, JSON.stringify(newPhotos));
+
+      // Call Gemini Vision backend
+      setIsAnalyzing(true);
+      try {
+        const res = await api.post(`/timeline/${timeline.id}/analyze`, {
+          weekNum,
+          imageBase64: base64
+        });
+        if (res.data.success) {
+          setTimeline(prev => ({ ...prev, ...res.data.timeline }));
+        }
+      } catch (err) {
+        alert("Failed to analyze image with AI: " + (err.response?.data?.error || err.message));
+      }
+      setIsAnalyzing(false);
     };
     reader.readAsDataURL(file);
   };
@@ -417,6 +434,11 @@ export default function Grow() {
               <span className={`${displayWeekNum === current ? 'bg-green-primary/20 text-green-primary border-green-primary/30' : 'bg-white/10 text-text-secondary border-white/20'} border text-xs font-bold px-3 py-1 rounded-full`}>
                 Week {displayWeekNum} of {weeks.length} {displayWeekNum === current ? '(Current)' : ''}
               </span>
+              {displayWeekData.ai_adjusted && (
+                <span className="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 uppercase tracking-wider shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                  <Sprout size={10} /> AI Branch
+                </span>
+              )}
               {ndvi?.weekly_ndvi?.[displayWeekNum - 1] && (
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
                   style={{
@@ -442,25 +464,45 @@ export default function Grow() {
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Camera size={16} className="text-green-primary" /> 
-                Field Update
+                Field Update Analysis
               </h3>
             </div>
             
             {weekPhotos[displayWeekNum] ? (
-              <div className="relative group rounded-lg overflow-hidden border border-white/10">
-                <img src={weekPhotos[displayWeekNum]} alt={`Week ${displayWeekNum} field`} className="w-full h-48 object-cover" />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                  <label className="cursor-pointer bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors border border-white/20">
-                    Replace Photo
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoUpload(displayWeekNum, e)} />
-                  </label>
+              <div className="space-y-4">
+                <div className="relative group rounded-lg overflow-hidden border border-white/10">
+                  <img src={weekPhotos[displayWeekNum]} alt={`Week ${displayWeekNum} field`} className="w-full h-48 object-cover opacity-80" />
+                  {isAnalyzing && (
+                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center backdrop-blur-sm z-10">
+                      <Loader2 className="text-green-primary animate-spin mb-2" size={32} />
+                      <p className="text-white font-bold animate-pulse text-sm">Gemini Vision Scanning...</p>
+                      <p className="text-text-secondary text-[10px] mt-1">Branching node timeline...</p>
+                    </div>
+                  )}
+                  {!isAnalyzing && (
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                      <label className="cursor-pointer bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-semibold transition-colors border border-white/20">
+                        Replace Photo
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoUpload(displayWeekNum, e)} />
+                      </label>
+                    </div>
+                  )}
                 </div>
+                {displayWeekData.analysis_summary && (
+                  <div className="bg-purple-900/30 border border-purple-500/30 p-3 rounded-lg flex items-start gap-3 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                    <Sprout className="text-purple-400 mt-0.5 flex-shrink-0" size={16} />
+                    <div className="text-xs">
+                      <span className="font-bold text-purple-300 block mb-1">AI Branch Generated</span>
+                      <span className="text-purple-100/70 leading-relaxed">{displayWeekData.analysis_summary}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 hover:border-green-primary/50 rounded-lg cursor-pointer bg-black/20 hover:bg-white/5 transition-all group">
                 <Camera className="text-text-secondary group-hover:text-green-primary mb-2 transition-colors" size={24} />
                 <span className="text-sm font-semibold text-text-secondary group-hover:text-white transition-colors">Upload photo for Week {displayWeekNum}</span>
-                <span className="text-[10px] text-text-secondary/50 mt-1">PNG, JPG up to 5MB</span>
+                <span className="text-[10px] text-text-secondary/50 mt-1">Gemini Vision will dynamically adjust remaining weeks</span>
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoUpload(displayWeekNum, e)} />
               </label>
             )}

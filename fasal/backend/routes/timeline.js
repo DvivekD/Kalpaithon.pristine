@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { supabase } from '../lib/supabase.js';
-import { askGemini } from '../lib/gemini.js';
+import { askGemini, askGeminiVision } from '../lib/gemini.js';
 import { getWeather } from '../lib/weather.js';
 import { getNDVIAnalysis } from '../lib/satellite.js';
 
@@ -207,6 +207,78 @@ router.patch('/:id/advance', async (req, res) => {
 
     res.json({ ...updated, harvest_ready: harvestReady });
   } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// POST /api/timeline/:id/analyze (Dynamic Branching)
+router.post('/:id/analyze', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { weekNum, imageBase64 } = req.body;
+
+    // 1. Fetch current timeline
+    const { data: timeline, error } = await supabase
+      .from('grow_timelines')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !timeline) throw new Error('Timeline not found');
+
+    const totalWeeks = timeline.harvest_window_week;
+    const pastWeeks = timeline.weeks.slice(0, weekNum); // Keep past weeks intact
+    const futureWeeks = timeline.weeks.slice(weekNum); // What we want to regenerate
+
+    // 2. Ask Gemini Vision to analyze and regenerate
+    const systemPrompt = `You are an expert AI Agronomist and Farm Manager with advanced vision capabilities. 
+You are managing a dynamic node-based crop timeline.
+The farmer is growing ${timeline.crop}. They are currently in Week ${weekNum}.
+They have provided a photo of their field.
+Your task is to analyze the photo, determine the crop's health, growth stage, and any issues (weeds, pests, delays).
+Based on this analysis, you must REGENERATE the timeline for the REMAINING weeks (Week ${weekNum + 1} to Harvest) to dynamically adjust to the ground truth.
+If the crop is delayed, push the harvest week back. If there are weeds, add a weeding task to the immediate next week.
+If the photo looks perfectly healthy and on track, just keep the remaining tasks optimal but confirm they are on track.
+You must return a JSON object with two fields:
+1. "analysis_summary": A short text explaining what you saw and why you are adjusting the timeline.
+2. "weeks": A JSON array of the remaining weeks (starting from week ${weekNum + 1}). Each week must match this structure:
+{
+  "week": Number,
+  "title": "String",
+  "task": "String",
+  "detail": "String",
+  "critical": Boolean,
+  "inputs_needed": "String"
+}`;
+
+    const userPrompt = `Here is the photo of the ${timeline.crop} field at Week ${weekNum}. The original plan for the remaining weeks was: ${JSON.stringify(futureWeeks)}. Please analyze the image and generate the newly adapted, dynamic path for the rest of the season.`;
+
+    const rawResponse = await askGeminiVision(systemPrompt, userPrompt, imageBase64);
+    const result = JSON.parse(rawResponse);
+
+    // 3. Construct the new branched timeline
+    const newWeeks = [...pastWeeks, ...result.weeks];
+    
+    // Attach the analysis summary to the current week so the farmer can read it
+    newWeeks[weekNum - 1].analysis_summary = result.analysis_summary;
+    newWeeks[weekNum - 1].ai_adjusted = true; // Flag for UI
+
+    // 4. Update the database
+    const { data: updated, error: updateError } = await supabase
+      .from('grow_timelines')
+      .update({ 
+        weeks: newWeeks,
+        harvest_window_week: newWeeks.length 
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) throw updateError;
+
+    res.json({ success: true, timeline: updated, analysis: result.analysis_summary });
+  } catch (e) {
+    console.error('Vision Analysis error:', e);
     res.status(500).json({ error: e.message });
   }
 });

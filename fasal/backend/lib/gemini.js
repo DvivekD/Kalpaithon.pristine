@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const API_KEY = process.env.GROQ_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = "llama-3.1-8b-instant";
 
 /**
@@ -64,6 +65,65 @@ export async function askGemini(systemPrompt, userPrompt) {
       console.error("Groq API Error Response:", JSON.stringify(error.response.data, null, 2));
     } else {
       console.error("Groq API Error:", error.message);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Ask Google Gemini (Vision) to analyze an image with a prompt.
+ */
+export async function askGeminiVision(systemPrompt, userPrompt, base64Image) {
+  if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set in .env");
+
+  // Clean the base64 string if it contains the data:image prefix
+  const cleanBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, "");
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const payload = {
+    system_instruction: {
+      parts: [{ text: systemPrompt }]
+    },
+    contents: [
+      {
+        parts: [
+          { text: userPrompt },
+          {
+            inline_data: {
+              mime_type: "image/jpeg",
+              data: cleanBase64
+            }
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.2,
+      topP: 0.95,
+      responseMimeType: "application/json"
+    }
+  };
+
+  try {
+    const response = await axios.post(url, payload, {
+      headers: { "Content-Type": "application/json" },
+      // Increase timeout for vision processing
+      timeout: 30000 
+    });
+
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!text) {
+      throw new Error("No response from Gemini Vision");
+    }
+
+    return text; // Gemini is requested to return JSON via responseMimeType
+  } catch (error) {
+    if (error.response) {
+      console.error("Gemini API Error Response:", JSON.stringify(error.response.data, null, 2));
+    } else {
+      console.error("Gemini API Error:", error.message);
     }
     throw error;
   }
