@@ -6,27 +6,28 @@ function ParticleTerrain() {
   const pointsRef = useRef();
   
   // Create a grid of points
-  const count = 10000;
-  const size = 120;
+  const gridX = 120;
+  const gridZ = 120;
+  const count = gridX * gridZ;
+  const separation = 2.5;
   
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
-    const gridSpan = Math.sqrt(count);
     
-    for(let i=0; i<count; i++) {
-      // Add organic jitter to break the perfect grid
-      const jitterX = (Math.random() - 0.5) * (size / gridSpan) * 0.8;
-      const jitterZ = (Math.random() - 0.5) * (size / gridSpan) * 0.8;
-      
-      const x = (i % gridSpan) / gridSpan * size - size/2 + jitterX;
-      const z = Math.floor(i / gridSpan) / gridSpan * size - size/2 + jitterZ;
-      
-      pos[i*3] = x;
-      pos[i*3+1] = 0;
-      pos[i*3+2] = z;
+    let i = 0;
+    for(let ix = 0; ix < gridX; ix++) {
+      for(let iz = 0; iz < gridZ; iz++) {
+        const x = ix * separation - ((gridX * separation) / 2);
+        const z = iz * separation - ((gridZ * separation) / 2);
+        
+        pos[i*3] = x;
+        pos[i*3+1] = 0;
+        pos[i*3+2] = z;
+        i++;
+      }
     }
     return pos;
-  }, [count]);
+  }, [gridX, gridZ, count]);
 
   const circleTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -54,20 +55,18 @@ function ParticleTerrain() {
   useFrame((state) => {
     if (!pointsRef.current) return;
     
-    const time = state.clock.getElapsedTime() * 0.15;
+    const time = state.clock.getElapsedTime() * 0.8;
     const posAttr = pointsRef.current.geometry.attributes.position;
     const posArray = posAttr.array;
     
     let i = 0;
-    const gridSpan = Math.sqrt(count);
-    for(let ix=0; ix<gridSpan; ix++) {
-      for(let iz=0; iz<gridSpan; iz++) {
+    for(let ix=0; ix < gridX; ix++) {
+      for(let iz=0; iz < gridZ; iz++) {
         const x = posArray[i*3];
         const z = posArray[i*3+2];
         
-        // Slow organic topographic waves
-        const y = Math.sin(x * 0.05 + time) * Math.cos(z * 0.05 + time) * 4 + 
-                  Math.sin(x * 0.02 - time * 0.5) * 3;
+        // Classic rolling terrain math matching the reference
+        const y = Math.sin((ix * 0.1) + time) * 3 + Math.sin((iz * 0.1) + time) * 3;
         
         posArray[i*3+1] = y;
         i++;
@@ -76,12 +75,12 @@ function ParticleTerrain() {
     posAttr.needsUpdate = true;
     
     // Gentle tilt parallax based on mouse
-    pointsRef.current.rotation.x = THREE.MathUtils.lerp(pointsRef.current.rotation.x, (Math.PI / 2.5) + (mouse.current.y * 0.05), 0.05);
+    pointsRef.current.rotation.x = THREE.MathUtils.lerp(pointsRef.current.rotation.x, (Math.PI / 2.3) + (mouse.current.y * 0.05), 0.05);
     pointsRef.current.rotation.z = THREE.MathUtils.lerp(pointsRef.current.rotation.z, mouse.current.x * 0.05, 0.05);
   });
 
   return (
-    <points ref={pointsRef} position={[0, -12, -20]} rotation={[Math.PI / 2.5, 0, 0]}>
+    <points ref={pointsRef} position={[0, -15, -40]} rotation={[Math.PI / 2.3, 0, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -91,11 +90,11 @@ function ParticleTerrain() {
         />
       </bufferGeometry>
       <pointsMaterial 
-        size={0.25} 
-        color="#2c9a6d" 
+        size={0.5} 
+        color="#edf5f1" 
         map={circleTexture}
         transparent 
-        opacity={0.6} 
+        opacity={0.8} 
         sizeAttenuation={true}
         depthWrite={false}
       />
@@ -106,8 +105,8 @@ function ParticleTerrain() {
 export default function GlobalWebGLBackground() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      <Canvas camera={{ position: [0, 2, 10], fov: 60 }} dpr={[1, 1.5]}>
-        <fog attach="fog" args={['#0b120e', 15, 80]} />
+      <Canvas camera={{ position: [0, 5, 20], fov: 75 }} dpr={[1, 1.5]}>
+        <fog attach="fog" args={['#0b120e', 20, 100]} />
         <ParticleTerrain />
       </Canvas>
     </div>
