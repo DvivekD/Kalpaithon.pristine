@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertTriangle, ChevronDown, ChevronUp, Sparkles, Check, Leaf } from 'lucide-react';
 import api from '../lib/api';
+import CropGallery3D from '../components/CropGallery3D';
 
 const LOADING_TEXTS = [
   "Reading your soil profile...",
@@ -322,12 +323,21 @@ export default function Plan() {
         </div>
       )}
 
-      {/* Crop grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {sorted.map((crop, i) => (
-          <CropCard key={crop.name} crop={crop} index={i} isRecommended={crop.name === data.recommended}
-            onSelect={handleSelect} selectedCrop={selectedCrop} />
-        ))}
+      {/* 3D Crop Gallery */}
+      <div className="mt-8">
+        <CropGallery3D 
+          crops={sorted} 
+          renderCard={(crop, i) => (
+            <CropCard 
+              key={crop.name} 
+              crop={crop} 
+              index={i} 
+              isRecommended={crop.name === data.recommended}
+              onSelect={handleSelect} 
+              selectedCrop={selectedCrop} 
+            />
+          )} 
+        />
       </div>
 
       {/* Warning modal */}
