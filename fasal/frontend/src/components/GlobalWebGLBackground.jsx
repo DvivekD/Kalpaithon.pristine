@@ -65,7 +65,7 @@ function ParticleTerrain() {
   });
 
   return (
-    <points ref={pointsRef} position={[0, -15, -40]} rotation={[Math.PI / 2.5, 0, 0]}>
+    <points ref={pointsRef} position={[0, -12, -20]} rotation={[Math.PI / 2.5, 0, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -75,10 +75,10 @@ function ParticleTerrain() {
         />
       </bufferGeometry>
       <pointsMaterial 
-        size={0.15} 
-        color="#1D9E75" 
+        size={0.4} 
+        color="#2c9a6d" 
         transparent 
-        opacity={0.3} 
+        opacity={0.7} 
         sizeAttenuation={true} 
       />
     </points>
@@ -87,9 +87,9 @@ function ParticleTerrain() {
 
 export default function GlobalWebGLBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 0%, #0d1511 0%, #0b120e 100%)' }}>
+    <div className="fixed inset-0 z-[-1] pointer-events-none">
       <Canvas camera={{ position: [0, 2, 10], fov: 60 }} dpr={[1, 1.5]}>
-        <fog attach="fog" args={['#0b120e', 10, 60]} />
+        <fog attach="fog" args={['#0b120e', 15, 80]} />
         <ParticleTerrain />
       </Canvas>
     </div>
