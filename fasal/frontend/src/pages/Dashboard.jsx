@@ -97,12 +97,21 @@ export default function Dashboard() {
         {/* Content + Next Season Card */}
         <div className="flex flex-1 overflow-hidden">
           <main className="flex-1 p-5 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
+            {/* 3D Digital Twin (Mobile/Tablet/Small Desktop View) */}
+            <div className="block lg:hidden mb-6">
+              <LowPolyFarm 
+                soilMoisture={iot?.soil_moisture ?? 50} 
+                cropProgress={timeline?.current_week && timeline?.weeks?.length ? timeline.current_week / timeline.weeks.length : 0} 
+                isRaining={weather?.current?.condition?.toLowerCase().includes('rain') || false} 
+              />
+            </div>
+            
             <div key={location.pathname} className="page-transition h-full">
               <Outlet />
             </div>
           </main>
 
-          <aside className="w-[360px] border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden xl:block overflow-y-auto">
+          <aside className="w-[360px] border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden lg:block overflow-y-auto">
             <div className="space-y-6">
               {/* 3D Digital Twin */}
               <div className="mb-6">
