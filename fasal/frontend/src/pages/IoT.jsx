@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Thermometer, Droplets, Sprout, Wifi, WifiOff, Activity, AlertTriangle, Radio, Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Area, AreaChart } from 'recharts';
 import { supabase } from '../lib/supabase';
+import ExplodedIotNode from '../components/ExplodedIotNode';
 
 // Circular gauge component
 function CircularGauge({ value, max, unit, color, icon: Icon, label, size = 140 }) {
@@ -248,6 +249,11 @@ export default function IoT() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 3D Hardware Node View */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="h-[500px] lg:h-[600px] w-full mb-6">
+        <ExplodedIotNode />
+      </motion.div>
 
       {/* Gauge Cards */}
       {latest && (
