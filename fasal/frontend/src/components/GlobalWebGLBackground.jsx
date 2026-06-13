@@ -87,7 +87,7 @@ function ParticleTerrain() {
 
 export default function GlobalWebGLBackground() {
   return (
-    <div className="fixed inset-0 z-[-1] pointer-events-none">
+    <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas camera={{ position: [0, 2, 10], fov: 60 }} dpr={[1, 1.5]}>
         <fog attach="fog" args={['#0b120e', 15, 80]} />
         <ParticleTerrain />

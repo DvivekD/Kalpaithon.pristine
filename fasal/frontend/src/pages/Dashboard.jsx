@@ -40,7 +40,7 @@ export default function Dashboard() {
   const isActive = (path) => location.pathname === path || (path === '/dashboard/plan' && location.pathname === '/dashboard');
 
   return (
-    <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-0 field-grid">
+    <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-10 field-grid">
       <aside className="w-64 bg-bg-card/80 backdrop-blur-xl border-r border-border hidden md:flex flex-col min-h-screen sticky top-0">
         <div className="p-5 border-b border-border/80">
           <div className="flex items-center gap-2 mb-2">
