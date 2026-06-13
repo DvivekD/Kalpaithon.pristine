@@ -41,25 +41,25 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-10 field-grid">
-      <aside className="w-64 bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
+      <aside className="w-[280px] xl:w-[320px] bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
         <div className="p-6 border-b border-white/5">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded bg-transparent border border-white/10 flex items-center justify-center">
               <Sprout className="text-white" size={16} />
             </div>
             <span className="hero-display text-2xl text-white tracking-wide">Fasal</span>
           </div>
           {profile && (
-            <div className="mt-4">
-              <p className="font-sans text-xs tracking-widest uppercase text-text-secondary opacity-60 mb-1">Active Profile</p>
-              <div className="flex items-center gap-2">
+            <div className="mt-8">
+              <p className="font-sans text-[10px] tracking-widest uppercase text-text-secondary opacity-60 mb-2">Active Profile</p>
+              <div className="flex flex-col gap-1">
                 <p className="font-semibold text-white text-sm">{profile.name}</p>
                 <span className="text-[10px] text-green-primary uppercase tracking-widest opacity-80">{profile.farmer_id}</span>
               </div>
             </div>
           )}
         </div>
-        <nav className="flex-1 py-6 flex flex-col gap-1">
+        <nav className="flex-1 py-8 flex flex-col gap-2">
           {nav.map((item, i) => item.divider ? (
             <div key={i} className="my-4 mx-6 border-t border-white/5" />
           ) : (
@@ -86,8 +86,8 @@ export default function Dashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col relative z-0 h-screen">
-        <header className="h-20 border-b border-white/5 bg-transparent backdrop-blur-md px-6 md:px-10 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
-          <div className="flex items-center gap-6">
+        <header className="h-24 border-b border-white/5 bg-transparent backdrop-blur-md px-8 md:px-12 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
+          <div className="flex items-center gap-8">
             <div className="md:hidden flex items-center gap-2">
               <Sprout className="text-white" size={20} />
             </div>
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
         {/* Content + Next Season Card */}
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 p-5 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
+          <main className="flex-1 p-6 md:p-10 lg:p-14 overflow-y-auto pb-24 md:pb-12 relative">
             {/* 3D Digital Twin (Mobile/Tablet/Small Desktop View) */}
             <div className="block lg:hidden mb-6">
               <LowPolyFarm 
@@ -127,8 +127,8 @@ export default function Dashboard() {
             </div>
           </main>
 
-          <aside className="w-[360px] border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden lg:block overflow-y-auto">
-            <div className="space-y-6">
+          <aside className="w-[400px] 2xl:w-[480px] border-l border-white/5 bg-transparent backdrop-blur-sm p-8 2xl:p-10 hidden lg:block overflow-y-auto">
+            <div className="space-y-12">
               {/* 3D Digital Twin */}
               <div className="mb-6">
                 <LowPolyFarm 
