@@ -6,10 +6,10 @@ function ParticleTerrain() {
   const pointsRef = useRef();
   
   // Create a grid of points
-  const gridX = 120;
-  const gridZ = 120;
+  const gridX = 150;
+  const gridZ = 150;
   const count = gridX * gridZ;
-  const separation = 2.5;
+  const separation = 3;
   
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -66,7 +66,7 @@ function ParticleTerrain() {
         const z = posArray[i*3+2];
         
         // Classic rolling terrain math matching the reference
-        const y = Math.sin((ix * 0.1) + time) * 3 + Math.sin((iz * 0.1) + time) * 3;
+        const y = Math.sin((ix * 0.1) + time) * 5 + Math.sin((iz * 0.1) + time) * 5;
         
         posArray[i*3+1] = y;
         i++;
@@ -74,13 +74,13 @@ function ParticleTerrain() {
     }
     posAttr.needsUpdate = true;
     
-    // Gentle tilt parallax based on mouse
-    pointsRef.current.rotation.x = THREE.MathUtils.lerp(pointsRef.current.rotation.x, (Math.PI / 2.3) + (mouse.current.y * 0.05), 0.05);
-    pointsRef.current.rotation.z = THREE.MathUtils.lerp(pointsRef.current.rotation.z, mouse.current.x * 0.05, 0.05);
+    // Gentle tilt parallax based on mouse (centered around 0 since grid is flat on floor)
+    pointsRef.current.rotation.x = THREE.MathUtils.lerp(pointsRef.current.rotation.x, (mouse.current.y * 0.15), 0.05);
+    pointsRef.current.rotation.y = THREE.MathUtils.lerp(pointsRef.current.rotation.y, (mouse.current.x * 0.15), 0.05);
   });
 
   return (
-    <points ref={pointsRef} position={[0, -15, -40]} rotation={[Math.PI / 2.3, 0, 0]}>
+    <points ref={pointsRef} position={[0, -15, -100]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -90,8 +90,8 @@ function ParticleTerrain() {
         />
       </bufferGeometry>
       <pointsMaterial 
-        size={0.5} 
-        color="#edf5f1" 
+        size={0.2} 
+        color="#ffffff" 
         map={circleTexture}
         transparent 
         opacity={0.8} 
@@ -105,8 +105,8 @@ function ParticleTerrain() {
 export default function GlobalWebGLBackground() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      <Canvas camera={{ position: [0, 5, 20], fov: 75 }} dpr={[1, 1.5]}>
-        <fog attach="fog" args={['#0b120e', 20, 100]} />
+      <Canvas camera={{ position: [0, 10, 50], fov: 60 }} dpr={[1, 1.5]}>
+        <fog attach="fog" args={['#0b120e', 50, 250]} />
         <ParticleTerrain />
       </Canvas>
     </div>
