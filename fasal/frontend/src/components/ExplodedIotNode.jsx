@@ -3,27 +3,29 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Edges, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
-// --- Colors & Materials from Reference ---
+// --- Dark Theme Colors ---
 const colors = {
-  foundation: '#a9a9a9', // Mounting Pole
-  structure: '#cfd6dc',  // Enclosure
-  slab: '#b5b5b5',       // Inner Mounts
-  wall: '#cc705b',       // Sensors / Accents
-  lintel: '#2c3e50',     // PCB / Battery
-  roof: '#e0e0e0',       // Solar Panel frame
-  solarGlass: '#1a2a3a', // Solar Glass
-  edge: '#333333'
+  shell: '#111315',      // Dark sleek drop-in ball shell
+  pcb: '#0d2b17',        // Dark green PCB
+  chip: '#1a1a1a',       // ESP32 chip black
+  oled: '#050505',       // OLED screen
+  oledText: '#4ade80',   // OLED text/glow
+  dht22: '#e2e8f0',      // DHT22 is white
+  buzzer: '#0f172a',     // Black cylinder
+  soilSensor: '#1e1e1e', // Black/Gold blade
+  gold: '#fbbf24',       // Gold traces
+  edge: '#2c9a6d'        // Green edges for tech vibe
 };
 
-const NodeLayer = ({ position, children, label, desc, isExploded }) => {
+const NodeLayer = ({ position, children, label, desc, isExploded, explodeMultiplier = 1 }) => {
   const ref = useRef();
   
   // Smoothly interpolate position based on exploded state
   useFrame((state, delta) => {
     ref.current.position.y = THREE.MathUtils.lerp(
       ref.current.position.y,
-      isExploded ? position[1] : 0, // When not exploded, everything collapses to y=0 (relative to their local offsets)
-      0.1 // speed
+      isExploded ? position[1] * explodeMultiplier : 0, 
+      0.08 // speed
     );
   });
 
@@ -31,14 +33,15 @@ const NodeLayer = ({ position, children, label, desc, isExploded }) => {
     <group ref={ref} position={[0, 0, 0]}>
       {children}
       {isExploded && label && (
-        <Html position={[2, 0, 0]} center className="pointer-events-none transition-opacity duration-300">
+        // Added larger X position to avoid overlapping the model, and absolute z-index
+        <Html position={[3.5, 0, 0]} center className="pointer-events-none transition-opacity duration-300 z-50">
           <div className="flex items-center -translate-y-1/2">
-            <div className="w-12 h-[1.5px] bg-slate-700 mr-3 relative">
-              <div className="absolute left-0 -top-[3px] w-2 h-2 rounded-full bg-slate-700"></div>
+            <div className="w-12 md:w-20 h-[1px] bg-green-primary/50 mr-3 relative">
+              <div className="absolute left-0 -top-[3px] w-1.5 h-1.5 rounded-full bg-green-primary shadow-[0_0_8px_rgba(44,154,109,0.8)]"></div>
             </div>
-            <div className="bg-white/95 backdrop-blur-md border border-slate-300 px-3 py-2 rounded-lg shadow-lg whitespace-nowrap pointer-events-auto">
-              <strong className="text-slate-800 text-sm">{label}</strong><br />
-              <span className="text-slate-500 text-xs">{desc}</span>
+            <div className="bg-[#0f1115]/95 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap pointer-events-auto">
+              <strong className="text-white text-sm font-bold tracking-wide">{label}</strong><br />
+              <span className="text-text-secondary text-xs">{desc}</span>
             </div>
           </div>
         </Html>
@@ -47,20 +50,20 @@ const NodeLayer = ({ position, children, label, desc, isExploded }) => {
   );
 };
 
-// Reusable Block with Edges matching reference aesthetic
-const Block = ({ size, position, rotation, color, roughness = 0.8 }) => (
+// Reusable Block
+const Block = ({ size, position, rotation, color, roughness = 0.8, edgeColor = colors.edge }) => (
   <mesh position={position} rotation={rotation} castShadow receiveShadow>
     <boxGeometry args={size} />
     <meshStandardMaterial color={color} roughness={roughness} />
-    <Edges scale={1} threshold={15} color={colors.edge} transparent opacity={0.4} />
+    <Edges scale={1} threshold={15} color={edgeColor} transparent opacity={0.3} />
   </mesh>
 );
 
-const CylinderBlock = ({ args, position, rotation, color, roughness = 0.8 }) => (
+const CylinderBlock = ({ args, position, rotation, color, roughness = 0.8, edgeColor = colors.edge }) => (
   <mesh position={position} rotation={rotation} castShadow receiveShadow>
     <cylinderGeometry args={args} />
     <meshStandardMaterial color={color} roughness={roughness} />
-    <Edges scale={1} threshold={15} color={colors.edge} transparent opacity={0.4} />
+    <Edges scale={1} threshold={15} color={edgeColor} transparent opacity={0.3} />
   </mesh>
 );
 
@@ -68,104 +71,123 @@ export default function ExplodedIotNode() {
   const [explode, setExplode] = useState(7.5); // 0 to 15 matching reference slider
 
   const val = explode / 15; // Normalized 0 to 1
+  const isExploded = val > 0.05;
 
   return (
-    <div className="w-full h-full relative bg-[#f4f6f8] rounded-xl overflow-hidden border border-white/5">
-      {/* UI Overlay */}
-      <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-md p-5 rounded-xl border border-black/5 shadow-[0_8px_32px_rgba(0,0,0,0.1)] w-72 pointer-events-auto">
-        <h2 className="text-lg font-bold text-slate-800 mb-2 leading-tight">Hardware Node</h2>
-        <p className="text-xs text-slate-500 mb-4 leading-relaxed">Interactive 3D exploded view of the Fasal edge sensor architecture.</p>
+    <div className="w-full h-full relative bg-transparent rounded-2xl overflow-hidden border border-white/5">
+      
+      {/* UI Overlay (Dark Theme) */}
+      <div className="absolute top-4 left-4 z-10 bg-[#0f1115]/80 backdrop-blur-md p-5 rounded-xl border border-white/5 shadow-2xl w-72 pointer-events-auto">
+        <h2 className="text-lg font-black text-white mb-2 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-primary animate-pulse"></div>
+          Fasal Drop-Node
+        </h2>
+        <p className="text-xs text-text-secondary mb-5 leading-relaxed">Interactive schematic of the spherical, deployable IoT architecture.</p>
         
         <div className="flex flex-col gap-2 mb-4">
-          <label className="flex justify-between text-xs font-bold text-slate-700">
+          <label className="flex justify-between text-xs font-bold text-text-secondary uppercase tracking-wider">
             <span>Explosion Spacing</span>
-            <span>{Math.round(val * 100)}%</span>
+            <span className="text-white">{Math.round(val * 100)}%</span>
           </label>
           <input 
             type="range" 
             min="0" max="15" step="0.1" 
             value={explode} 
             onChange={(e) => setExplode(parseFloat(e.target.value))}
-            className="w-full cursor-pointer accent-slate-700"
+            className="w-full cursor-pointer accent-green-primary"
           />
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-          <div className="flex items-center gap-2 text-[10px] text-slate-700 font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.foundation}}></div> Mounting Pole</div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-700 font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.structure}}></div> Main Enclosure</div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-700 font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.lintel}}></div> Internal PCB / Battery</div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-700 font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.wall}}></div> Environmental Sensors</div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-700 font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.solarGlass}}></div> Solar Array</div>
+        <div className="flex flex-col gap-2 mt-6">
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.shell}}></div> Spherical Shell</div>
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.oled}}></div> OLED Display</div>
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.pcb}}></div> ESP32 / Logic Board</div>
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.dht22}}></div> DHT22 Environment</div>
+          <div className="flex items-center gap-2 text-[10px] text-text-secondary font-semibold uppercase tracking-wider"><div className="w-3 h-3 rounded-sm" style={{backgroundColor: colors.soilSensor}}></div> Capacitive Soil Probe</div>
         </div>
       </div>
 
-      <Canvas shadows camera={{ position: [25, 20, 25], fov: 45 }}>
-        <color attach="background" args={['#f4f6f8']} />
-        
-        <ambientLight intensity={0.5} />
+      <Canvas shadows camera={{ position: [20, 15, 20], fov: 45 }}>
+        {/* Transparent background to blend with dark dashboard */}
+        <ambientLight intensity={0.6} />
         <directionalLight 
-          position={[20, 40, 20]} 
-          intensity={0.7} 
+          position={[10, 20, 10]} 
+          intensity={1.5} 
           castShadow 
           shadow-mapSize={[2048, 2048]}
         />
-        <hemisphereLight intensity={0.4} color="#ffffff" groundColor="#444444" />
+        {/* Soft fill light */}
+        <hemisphereLight intensity={0.5} color="#4ade80" groundColor="#0f172a" />
 
         <OrbitControls 
           enableDamping 
           dampingFactor={0.05} 
-          target={[0, 4, 0]} 
+          target={[0, 0, 0]} 
           autoRotate 
           autoRotateSpeed={0.5} 
         />
 
-        <group position={[0, -4, 0]}>
-          {/* Layer 1: Mounting Pole */}
-          <NodeLayer position={[0, 0, 0]} isExploded={val > 0.1} label="Mounting Base" desc="Galvanized steel pipe mount">
-            <CylinderBlock args={[0.5, 0.5, 6, 16]} position={[0, 3, 0]} color={colors.foundation} />
-            <Block size={[2, 0.4, 2]} position={[0, 0.2, 0]} color={colors.foundation} />
+        <group position={[0, 0, 0]}>
+          
+          {/* Layer 1: Top Hemisphere Shell */}
+          <NodeLayer position={[0, 12, 0]} isExploded={isExploded} explodeMultiplier={val} label="Protective Shell (Top)" desc="UV-resistant drop-in casing">
+            <mesh position={[0, 0, 0]} castShadow receiveShadow>
+              {/* sphereGeometry args: [radius, widthSeg, heightSeg, phiStart, phiLength, thetaStart, thetaLength] */}
+              <sphereGeometry args={[3.2, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              <meshStandardMaterial color={colors.shell} roughness={0.9} side={THREE.DoubleSide} />
+              <Edges scale={1} threshold={15} color={colors.edge} transparent opacity={0.1} />
+            </mesh>
           </NodeLayer>
 
-          {/* Layer 2: Main Enclosure */}
-          <NodeLayer position={[0, val * 3, 0]} isExploded={val > 0.1} label="IP67 Enclosure" desc="Weatherproof polycarbonate housing">
-            <Block size={[4, 5, 3]} position={[0, 6.5, 0]} color={colors.structure} />
-            {/* Front Door Panel */}
-            <Block size={[3.8, 4.8, 0.2]} position={[0, 6.5, 1.55]} color={colors.slab} />
+          {/* Layer 2: OLED Display */}
+          <NodeLayer position={[0, 8, 0]} isExploded={isExploded} explodeMultiplier={val} label="OLED Display" desc="128x64 I2C Status Screen">
+            <Block size={[1.8, 0.1, 1.2]} position={[0, 1.5, 0]} color={colors.oled} />
+            {/* The lit screen area */}
+            <mesh position={[0, 1.56, 0]} rotation={[-Math.PI/2, 0, 0]}>
+              <planeGeometry args={[1.5, 0.9]} />
+              <meshBasicMaterial color={colors.oledText} transparent opacity={0.8} />
+            </mesh>
           </NodeLayer>
 
-          {/* Layer 3: Internal PCB */}
-          <NodeLayer position={[0, val * 6, 0]} isExploded={val > 0.1} label="Logic & Power" desc="Main PCB, ESP32, and Li-ion Battery">
-            {/* PCB Board */}
-            <Block size={[2.8, 3.8, 0.1]} position={[0, 6.5, 1.2]} color={colors.lintel} />
-            {/* MCU Chip */}
-            <Block size={[0.6, 0.6, 0.1]} position={[0, 7.5, 1.3]} color={colors.edge} />
-            {/* Connectors */}
-            <Block size={[2.0, 0.4, 0.3]} position={[0, 5.0, 1.3]} color={colors.solarGlass} />
-            {/* Battery */}
-            <CylinderBlock args={[0.4, 0.4, 2.5, 16]} position={[0.8, 6.0, 1.3]} color={colors.roof} />
+          {/* Layer 3: ESP32 & Logic Board */}
+          <NodeLayer position={[0, 4, 0]} isExploded={isExploded} explodeMultiplier={val} label="ESP32 Core & Buzzer" desc="WiFi/BLE MCU with alert system">
+            {/* PCB */}
+            <Block size={[2.8, 0.1, 3.8]} position={[0, 0, 0]} color={colors.pcb} />
+            {/* ESP32 Chip */}
+            <Block size={[1, 0.3, 1.5]} position={[-0.5, 0.2, 0.5]} color={colors.chip} edgeColor="#555" />
+            {/* Wi-Fi Antenna trace (visual) */}
+            <Block size={[0.8, 0.31, 0.2]} position={[-0.5, 0.2, 1.5]} color={colors.gold} />
+            {/* Buzzer */}
+            <CylinderBlock args={[0.4, 0.4, 0.5, 16]} position={[0.6, 0.3, -0.8]} color={colors.buzzer} edgeColor="#444" />
           </NodeLayer>
 
-          {/* Layer 4: Sensors */}
-          <NodeLayer position={[0, val * 9, 0]} isExploded={val > 0.1} label="Sensor Probes" desc="Soil Moisture & DHT22">
-            {/* DHT22 side mount */}
-            <Block size={[1, 1.5, 1]} position={[2.2, 5.5, 0]} color={colors.wall} />
-            <CylinderBlock args={[0.1, 0.1, 2, 8]} position={[2.2, 4.2, 0]} color={colors.wall} />
-            
-            {/* Soil Probe Wire */}
-            <CylinderBlock args={[0.05, 0.05, 8, 8]} position={[-1.5, 2.0, 0]} color={colors.wall} />
-            {/* Soil Probe Tip */}
-            <CylinderBlock args={[0.15, 0.05, 1.5, 8]} position={[-1.5, -2.0, 0]} color={colors.wall} />
+          {/* Layer 4: DHT22 Sensor */}
+          <NodeLayer position={[0, 0, 0]} isExploded={isExploded} explodeMultiplier={val} label="DHT22 Sensor" desc="Ambient Temp & Humidity">
+            <Block size={[1.2, 0.6, 1.8]} position={[1.8, 0, 0]} color={colors.dht22} edgeColor="#ccc" />
+            {/* Sensor Slits */}
+            <Block size={[0.1, 0.61, 1.2]} position={[2.3, 0, 0]} color="#aaa" />
           </NodeLayer>
 
-          {/* Layer 5: Solar Panel */}
-          <NodeLayer position={[0, val * 12, 0]} isExploded={val > 0.1} label="Solar Array" desc="6V 5W Monocrystalline Panel">
-            {/* Angled Mount */}
-            <Block size={[0.6, 1.5, 0.6]} position={[0, 9.5, -0.5]} rotation={[0.5, 0, 0]} color={colors.foundation} />
-            {/* Panel Frame */}
-            <Block size={[5, 0.2, 4]} position={[0, 10.3, -1]} rotation={[0.5, 0, 0]} color={colors.roof} />
-            {/* Panel Glass */}
-            <Block size={[4.6, 0.1, 3.6]} position={[0, 10.4, -1]} rotation={[0.5, 0, 0]} color={colors.solarGlass} />
+          {/* Layer 5: Capacitive Soil Sensor */}
+          <NodeLayer position={[0, -5, 0]} isExploded={isExploded} explodeMultiplier={val} label="Capacitive Soil Probe" desc="Corrosion-resistant analog depth probe">
+            {/* Probe Top (PCB part) */}
+            <Block size={[1.2, 1.5, 0.2]} position={[0, -0.5, 0]} color={colors.pcb} />
+            {/* Probe Blade */}
+            <Block size={[0.8, 4, 0.1]} position={[0, -3.2, 0]} color={colors.soilSensor} />
+            {/* Gold traces on the blade */}
+            <Block size={[0.6, 3.8, 0.11]} position={[0, -3.2, 0]} color={colors.gold} />
           </NodeLayer>
+
+          {/* Layer 6: Bottom Hemisphere Shell */}
+          <NodeLayer position={[0, -9, 0]} isExploded={isExploded} explodeMultiplier={val} label="Protective Shell (Base)" desc="Weighted drop-base">
+            <mesh position={[0, 0, 0]} castShadow receiveShadow>
+              {/* sphereGeometry args: [radius, widthSeg, heightSeg, phiStart, phiLength, thetaStart, thetaLength] */}
+              <sphereGeometry args={[3.2, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2]} />
+              <meshStandardMaterial color={colors.shell} roughness={0.9} side={THREE.DoubleSide} />
+              <Edges scale={1} threshold={15} color={colors.edge} transparent opacity={0.1} />
+            </mesh>
+          </NodeLayer>
+
         </group>
       </Canvas>
     </div>
