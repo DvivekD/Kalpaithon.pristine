@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Loader2, TrendingUp, TrendingDown, Minus, ExternalLink, MapPin, AlertCircle, CheckCircle2, Phone, Navigation2, PackageSearch } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import api from '../lib/api';
+import BuyerMap3D from '../components/BuyerMap3D';
 
 function ScoreGauge({ score, total, color }) {
   // 0-100 mapped to -90 to 90 degrees
@@ -346,77 +347,12 @@ function BuyerSection({ profileLat, profileLon }) {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row h-[600px]">
-          {/* Radar View (Center) */}
-          <div className="flex-1 relative bg-[#0D1517] overflow-hidden border-r border-[#1D9E75]/10">
-            {/* Grid Pattern */}
-            <div className="absolute inset-0 opacity-10" 
-              style={{ backgroundImage: 'radial-gradient(#1D9E75 1px, transparent 0)', backgroundSize: '40px 40px' }} />
-            
-            {/* Radar Circles */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-20">
-              <div className="w-[80%] h-[80%] border border-[#1D9E75] rounded-full" />
-              <div className="w-[60%] h-[60%] border border-[#1D9E75] rounded-full absolute" />
-              <div className="w-[40%] h-[40%] border border-[#1D9E75] rounded-full absolute" />
-              <div className="w-[20%] h-[20%] border border-[#1D9E75] rounded-full absolute" />
-            </div>
-
-            {/* Triangulation Radar Hand */}
-            <div className={`absolute inset-0 origin-center bg-gradient-conic from-[#1D9E75]/30 to-transparent ${scanning ? 'animate-radar' : 'opacity-0'}`} 
-              style={{ clipPath: 'polygon(50% 50%, 100% 0%, 100% 100%)' }} />
-
-            {/* Center (YOU) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-              <div className="relative">
-                <div className="w-4 h-4 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.8)] border-4 border-[#1D9E75]" />
-                <span className="absolute top-6 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-[#1D9E75] px-1.5 py-0.5 rounded uppercase">YOU</span>
-              </div>
-            </div>
-
-            {/* Buyer Pins & Triangulation Lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
-              {filteredBuyers.map((b, i) => {
-                // Calculate actual bearing and distance-based positioning
-                const bearing = calculateBearing(profileLat, profileLon, b.lat, b.lon);
-                const angle = bearing - 90; 
-                const distanceRatio = Math.min(b.distance_km / 50, 1);
-                const x = 50 + Math.cos(angle * Math.PI / 180) * 42 * distanceRatio;
-                const y = 50 + Math.sin(angle * Math.PI / 180) * 42 * distanceRatio;
-                
-                return (
-                  <g key={i}>
-                    {/* Triangulation Line */}
-                    <line x1="50" y1="50" x2={x} y2={y} 
-                      className="stroke-[#1D9E75]/20 stroke-[0.5]" strokeDasharray="1 1" />
-                    
-                    {/* Buyer Dot with Ping Animation */}
-                    <foreignObject x={x - 5} y={y - 5} width="10" height="10" className="pointer-events-auto">
-                      <div className="group relative flex items-center justify-center w-full h-full">
-                        {/* Ping Circle */}
-                        <div className={`absolute w-4 h-4 rounded-full animate-ping opacity-75 ${
-                          b.type === 'HOTEL' ? 'bg-amber-400' : b.type === 'FPO' ? 'bg-blue-400' : 'bg-green-400'
-                        }`} />
-                        
-                        {/* Actual Dot */}
-                        <div className={`relative w-2 h-2 rounded-full border-[0.5px] border-white shadow-[0_0_5px_rgba(255,255,255,0.5)] transition-transform hover:scale-150 ${
-                          b.type === 'HOTEL' ? 'bg-[#FFD700]' : b.type === 'FPO' ? 'bg-[#3B82F6]' : 'bg-[#1D9E75]'
-                        }`} />
-
-                        {/* Tooltip (scaled for 100x100 viewbox) */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-[#0D1517] border border-[#1D9E75]/50 px-2 py-1 rounded shadow-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 whitespace-nowrap"
-                          style={{ fontSize: '2px', transform: 'translateX(-50%) scale(0.3)' }}>
-                          <p className="font-black text-white">{b.name}</p>
-                          <p className="text-[#1D9E75] font-bold">{b.type} • {b.distance_km}km</p>
-                        </div>
-                      </div>
-                    </foreignObject>
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* Bottom Info */}
-            <div className="absolute bottom-4 left-6 right-6 flex justify-between text-[10px] font-mono text-[#1D9E75]/60 uppercase">
-               <span>RADAR_SCAN: ACTIVE (50KM)</span>
+          {/* Radar View 3D (Center) */}
+          <div className="flex-1 relative bg-[#0D1517] border-r border-[#1D9E75]/10">
+            <BuyerMap3D buyers={filteredBuyers} profileLat={profileLat} profileLon={profileLon} />
+            {/* Bottom Info Overlay */}
+            <div className="absolute bottom-4 left-6 right-6 flex justify-between text-[10px] font-mono text-[#1D9E75]/60 uppercase pointer-events-none z-10">
+               <span>RADAR_SCAN: ACTIVE (200KM)</span>
                <span>HITS: {filteredBuyers.length}</span>
                <span>SENSORS: {sensorStatus}</span>
             </div>
