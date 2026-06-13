@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-10 field-grid">
-      <aside className="w-[280px] xl:w-[320px] bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
+      <aside className="w-[220px] xl:w-[240px] bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded bg-transparent border border-white/10 flex items-center justify-center">
@@ -127,8 +127,8 @@ export default function Dashboard() {
             </div>
           </main>
 
-          <aside className="w-[400px] 2xl:w-[480px] border-l border-white/5 bg-transparent backdrop-blur-sm p-8 2xl:p-10 hidden lg:block overflow-y-auto">
-            <div className="space-y-12">
+          <aside className="w-[340px] 2xl:w-[360px] border-l border-white/5 bg-transparent backdrop-blur-sm p-6 2xl:p-8 hidden lg:block overflow-y-auto">
+            <div className="space-y-10">
               {/* 3D Digital Twin */}
               <div className="mb-6">
                 <LowPolyFarm 
