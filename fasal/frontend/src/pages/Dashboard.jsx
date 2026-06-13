@@ -41,36 +41,41 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-10 field-grid">
-      <aside className="w-64 bg-bg-card/80 backdrop-blur-xl border-r border-border hidden md:flex flex-col min-h-screen sticky top-0">
-        <div className="p-5 border-b border-border/80">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-green-primary/20 border border-green-primary/30 flex items-center justify-center">
-              <Sprout className="text-green-primary" size={18} />
+      <aside className="w-64 bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
+        <div className="p-6 border-b border-white/5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-8 h-8 rounded bg-transparent border border-white/10 flex items-center justify-center">
+              <Sprout className="text-white" size={16} />
             </div>
-            <span className="hero-display text-2xl leading-none">Fasal</span>
+            <span className="hero-display text-2xl text-white tracking-wide">Fasal</span>
           </div>
           {profile && (
-            <div className="text-xs text-text-secondary mt-1">
-              <p className="font-medium text-text-primary">{profile.name}</p>
-              <span className="inline-block bg-green-primary/20 text-green-primary text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 border border-green-primary/30 shadow-[0_0_10px_rgba(29,158,117,0.2)]">{profile.farmer_id}</span>
+            <div className="mt-4">
+              <p className="font-sans text-xs tracking-widest uppercase text-text-secondary opacity-60 mb-1">Active Profile</p>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-white text-sm">{profile.name}</p>
+                <span className="text-[10px] text-green-primary uppercase tracking-widest opacity-80">{profile.farmer_id}</span>
+              </div>
             </div>
           )}
         </div>
-        <nav className="flex-1 py-3">
+        <nav className="flex-1 py-6 flex flex-col gap-1">
           {nav.map((item, i) => item.divider ? (
-            <div key={i} className="my-2 mx-4 border-t border-border" />
+            <div key={i} className="my-4 mx-6 border-t border-white/5" />
           ) : (
             <Link key={item.path} to={item.path}
-              className={`flex items-center gap-3 px-5 py-2.5 mx-2 rounded-xl text-sm font-medium transition-all ${isActive(item.path) ? 'bg-green-primary/20 text-green-primary border border-green-primary/30 shadow-[inset_0_0_18px_rgba(29,158,117,0.13)]' : 'text-text-secondary hover:bg-white/5 hover:text-text-primary border border-transparent'}`}>
-              {item.icon} {item.label}
+              className={`flex items-center gap-4 px-6 py-3 transition-all ${isActive(item.path) ? 'text-white border-l-2 border-green-primary bg-gradient-to-r from-green-primary/10 to-transparent' : 'text-text-secondary hover:text-white border-l-2 border-transparent hover:border-white/20'}`}>
+              <div className="opacity-80">{item.icon}</div>
+              <span className="uppercase tracking-widest text-[11px] font-semibold">{item.label}</span>
             </Link>
           ))}
           <a href="https://t.me/Kisaan1207bot" target="_blank" rel="noreferrer"
-            className="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5 hover:text-text-primary transition-all">
-            <MessageCircle size={18} /> Telegram Bot
+            className="flex items-center gap-4 px-6 py-3 text-text-secondary hover:text-white border-l-2 border-transparent hover:border-white/20 transition-all mt-auto">
+            <div className="opacity-80"><MessageCircle size={18} /></div>
+            <span className="uppercase tracking-widest text-[11px] font-semibold">Telegram Bot</span>
           </a>
         </nav>
-        <div className="p-4 border-t border-border">
+        <div className="p-6 border-t border-white/5">
           <button onClick={() => { localStorage.clear(); navigate('/'); }}
             className="flex items-center gap-2 text-xs text-text-secondary hover:text-coral transition">
             <LogOut size={14} /> Sign out
@@ -81,19 +86,26 @@ export default function Dashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col relative z-0 h-screen">
-        <header className="h-16 border-b border-border bg-bg-card/75 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
-          <div className="flex items-center gap-3">
-            <div className="md:hidden flex items-center gap-2 mr-2">
-              <Sprout className="text-green-primary" size={20} />
+        <header className="h-20 border-b border-white/5 bg-transparent backdrop-blur-md px-6 md:px-10 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
+          <div className="flex items-center gap-6">
+            <div className="md:hidden flex items-center gap-2">
+              <Sprout className="text-white" size={20} />
             </div>
-            {profile?.current_season && <span className="bg-green-primary/20 border border-green-primary/30 text-green-primary shadow-[0_0_8px_rgba(29,158,117,0.2)] text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">{profile.current_season}</span>}
-            {profile && <span className="text-[10px] md:text-xs text-text-secondary truncate max-w-[120px] md:max-w-none">{profile.district}</span>}
+            {profile?.current_season && (
+              <div className="flex items-center gap-2 border border-white/10 px-3 py-1.5 rounded-sm bg-black/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-primary animate-pulse"></span>
+                <span className="text-[10px] uppercase tracking-widest text-green-primary font-bold">{profile.current_season}</span>
+              </div>
+            )}
+            {profile && <span className="text-[10px] md:text-xs text-text-secondary uppercase tracking-wider truncate max-w-[120px] md:max-w-none">{profile.district}</span>}
           </div>
           {weather?.current && (
-            <div className="flex items-center gap-4 text-xs text-text-secondary">
-              <span className="flex items-center gap-1"><Thermometer size={14} /> {weather.current.temp}°C</span>
-              <span className="flex items-center gap-1"><Droplets size={14} /> {weather.current.humidity}%</span>
-              <span className="flex items-center gap-1"><Cloud size={14} /> {weather.summary.rainfall_7d}mm forecast</span>
+            <div className="flex items-center gap-6 text-[10px] uppercase tracking-widest text-text-secondary border border-white/5 px-4 py-2 rounded-sm bg-black/20">
+              <span className="flex items-center gap-2 text-white"><Thermometer size={14} className="text-text-secondary" /> {weather.current.temp}°C</span>
+              <span className="w-px h-3 bg-white/10"></span>
+              <span className="flex items-center gap-2"><Droplets size={14} /> {weather.current.humidity}%</span>
+              <span className="w-px h-3 bg-white/10 hidden md:block"></span>
+              <span className="hidden md:flex items-center gap-2"><Cloud size={14} /> {weather.summary.rainfall_7d}mm Forecast</span>
             </div>
           )}
         </header>
