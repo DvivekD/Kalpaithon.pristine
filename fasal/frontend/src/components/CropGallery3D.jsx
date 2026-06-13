@@ -16,7 +16,7 @@ function GalleryItem({ item, index, total, radius, renderCard }) {
         transform 
         occlude="blending"
         className="w-[350px] pointer-events-auto select-none"
-        scale={0.1}
+        distanceFactor={1.8}
       >
         <div 
           className="w-full transform hover:scale-[1.02] transition-transform duration-300"
@@ -34,9 +34,9 @@ function GalleryCylinder({ items, renderCard }) {
   const groupRef = useRef();
   const { gl } = useThree();
   
-  // A scale of 0.1 makes a 350px card = 35 WebGL units wide.
-  // We need enough circumference to fit all cards with some padding.
-  const radius = Math.max(30, (items.length * 35 * 1.2) / (2 * Math.PI));
+  // Standard Drei carousel math
+  // distanceFactor=1.8 and radius=4 works well for ~350px cards
+  const radius = Math.max(4, (items.length * 0.4));
 
   // Drag physics state
   const rotation = useRef(0);
