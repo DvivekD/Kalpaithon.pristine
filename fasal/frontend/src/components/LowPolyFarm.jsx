@@ -98,7 +98,8 @@ function Planet({ soilMoisture = 50, cropProgress = 0.5 }) {
     return dry.lerp(wet, moistureRatio).getHexString();
   }, [soilMoisture]);
 
-  const trees = useMemo(() => {
+  // Generate static tree positions once
+  const baseTrees = useMemo(() => {
     const arr = [];
     const radius = 2.5;
     for (let i = 0; i < 35; i++) {
@@ -114,15 +115,21 @@ function Planet({ soilMoisture = 50, cropProgress = 0.5 }) {
       const euler = new THREE.Euler().setFromQuaternion(quaternion);
 
       const maxScale = Math.random() * 0.4 + 0.4;
-      const currentScale = Math.max(0.1, cropProgress * maxScale);
-
       const greens = ["#1D9E75", "#22C55E", "#15803D", "#16A34A"];
       const treeColor = greens[Math.floor(Math.random() * greens.length)];
 
-      arr.push({ pos: [x, y, z], rot: [euler.x, euler.y, euler.z], scale: currentScale, color: treeColor });
+      arr.push({ pos: [x, y, z], rot: [euler.x, euler.y, euler.z], maxScale, color: treeColor });
     }
     return arr;
-  }, [cropProgress]);
+  }, []); // Empty dependency array so positions are fixed
+
+  // Calculate current scale based on progress
+  const trees = useMemo(() => {
+    return baseTrees.map(t => ({
+      ...t,
+      scale: Math.max(0.05, cropProgress * t.maxScale * 2.5) // Multiplier to make full grown trees larger
+    }));
+  }, [baseTrees, cropProgress]);
 
   return (
     <group ref={planetRef}>

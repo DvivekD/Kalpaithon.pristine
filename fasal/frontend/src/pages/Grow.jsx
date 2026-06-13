@@ -284,6 +284,7 @@ export default function Grow() {
         setTimeline(refreshed.data);
         const nextWeek = Math.min(weekNum + 1, refreshed.data?.weeks?.length || weekNum + 1);
         setSelectedWeek(nextWeek);
+        window.dispatchEvent(new Event('fasal-timeline-updated'));
       }
     } catch (err) {
       alert("Failed to analyze image with AI: " + (err.response?.data?.error || err.message));
@@ -308,6 +309,7 @@ export default function Grow() {
     try {
       const res = await api.patch(`/timeline/${timeline.id}/advance`, { current_week: timeline.current_week + 1 });
       setTimeline(prev => ({ ...prev, ...res.data }));
+      window.dispatchEvent(new Event('fasal-timeline-updated'));
     } catch (e) {
       alert('Failed to advance');
     }
