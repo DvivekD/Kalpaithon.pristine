@@ -16,7 +16,7 @@ function GalleryItem({ item, index, total, radius, renderCard }) {
         transform 
         occlude="blending"
         className="w-[350px] pointer-events-auto select-none"
-        distanceFactor={radius * 1.6}
+        scale={0.1}
       >
         <div 
           className="w-full transform hover:scale-[1.02] transition-transform duration-300"
@@ -34,9 +34,9 @@ function GalleryCylinder({ items, renderCard }) {
   const groupRef = useRef();
   const { gl } = useThree();
   
-  // Calculate a radius in WebGL units
-  // For 10 items, radius of ~16 gives a good circumference with spacing
-  const radius = Math.max(16, (items.length * 4.5) / (2 * Math.PI));
+  // A scale of 0.1 makes a 350px card = 35 WebGL units wide.
+  // We need enough circumference to fit all cards with some padding.
+  const radius = Math.max(30, (items.length * 35 * 1.2) / (2 * Math.PI));
 
   // Drag physics state
   const rotation = useRef(0);
