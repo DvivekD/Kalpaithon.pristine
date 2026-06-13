@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import T35Challenge from './pages/T35Challenge';
 import IoT from './pages/IoT';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import GlobalWebGLBackground from './components/GlobalWebGLBackground';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('fasal_token');
@@ -21,6 +22,7 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <GlobalWebGLBackground />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/register" element={<Register />} />

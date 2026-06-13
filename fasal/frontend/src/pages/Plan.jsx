@@ -85,7 +85,7 @@ function CropCard({ crop, index, isRecommended, onSelect, selectedCrop }) {
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-lg font-semibold text-white">{crop.name} {crop.kannada_name && <span className="text-[13px] text-text-secondary font-normal">({crop.kannada_name})</span>}</h3>
+            <h3 className="text-lg font-serif font-semibold text-white">{crop.name} {crop.kannada_name && <span className="text-[13px] text-text-secondary font-sans font-normal">({crop.kannada_name})</span>}</h3>
           </div>
           <div className="flex flex-col items-center flex-shrink-0">
             <SuccessRing pct={crop.success_pct} size={64} delay={index * 80 + 200} />
@@ -224,7 +224,7 @@ export default function Plan() {
         <div className="w-32 h-32 mb-6 rounded-full glass-panel flex items-center justify-center border border-green-primary/20 shadow-[0_0_30px_rgba(29,158,117,0.15)]">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="10" y="50" width="60" height="8" rx="4" fill="rgba(29,158,117,0.2)"/><rect x="20" y="42" width="40" height="8" rx="4" fill="rgba(29,158,117,0.4)"/><path d="M40 10 C40 10 25 25 25 35 C25 45 35 50 40 50 C45 50 55 45 55 35 C55 25 40 10 40 10Z" fill="#1D9E75" opacity="0.8"/><path d="M40 20 C40 20 32 30 32 36 C32 42 36 45 40 45" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5" fill="none" opacity="0.5"/></svg>
         </div>
-        <h2 className="text-2xl font-bold mb-2 text-white">Ready to find your best crop?</h2>
+        <h2 className="text-2xl font-serif font-bold mb-2 text-white">Ready to find your best crop?</h2>
         <p className="text-text-secondary mb-6 max-w-md">We'll analyse your soil, weather, and season to rank every viable crop for your farm.</p>
         <div className="space-y-2 text-left mb-8">
           {['12 crops ranked by success rate', 'Real input cost estimates', 'Week-by-week growing plan included'].map((t, i) => (
@@ -265,7 +265,7 @@ export default function Plan() {
       {/* Header + controls */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Stage 1 — Plan your crop</h1>
+          <h1 className="text-2xl font-serif font-bold">Stage 1 — Plan your crop</h1>
           <p className="text-[#5A7068] text-sm mt-1">AI ranks crops by agronomic success for your farm</p>
         </div>
         <div className="flex items-center gap-3">
@@ -299,7 +299,7 @@ export default function Plan() {
       {/* Plan Insights Panel */}
       {(data.recommended || data.season_note || data.soil_health_note) && (
         <div className="bg-bg-card border border-white/10 rounded-xl p-5 mb-2 shadow-sm">
-          <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2"><Sparkles size={16} className="text-amber-400" /> Agronomic Insights</h3>
+          <h3 className="text-sm font-serif font-bold text-white mb-4 flex items-center gap-2"><Sparkles size={16} className="text-amber-400" /> Agronomic Insights</h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {data.recommended && (
               <div className="bg-white/5 p-3.5 rounded-lg border border-white/5">
