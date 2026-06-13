@@ -49,7 +49,7 @@ CRITICAL KNOWLEDGE:
 - NO RAINFED RAGI IN ZAID: Ragi is a Kharif crop. Recommending it for rainfed summer is a major error.
 
 Always return ONLY valid JSON.`;
-    const userPrompt = `A farmer in ${profile.district} needs crop recommendations. Rank exactly 4 crops for ${season || detectSeason()}.
+    const userPrompt = `A farmer in ${profile.district} needs crop recommendations. Rank exactly 10 crops for ${season || detectSeason()}.
 
 FARMER PROFILE:
 - District: ${profile.district}
@@ -96,7 +96,7 @@ Return ONLY JSON:
       predictions = JSON.parse(raw);
     } catch (parseErr) {
       console.error(`[${requestId}] Gemini parse failed, retrying with tiny prompt:`, parseErr.message);
-      const retryRaw = await askGemini(systemPrompt, userPrompt + '\n\nIMPORTANT: Only return 4 crops. MAX 10 words for any text field. Return ONLY JSON.');
+      const retryRaw = await askGemini(systemPrompt, userPrompt + '\n\nIMPORTANT: Only return 10 crops. MAX 10 words for any text field. Return ONLY JSON.');
       try {
         predictions = JSON.parse(retryRaw);
       } catch (retryErr) {
