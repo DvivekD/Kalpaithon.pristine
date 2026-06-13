@@ -14,8 +14,12 @@ function ParticleTerrain() {
     const gridSpan = Math.sqrt(count);
     
     for(let i=0; i<count; i++) {
-      const x = (i % gridSpan) / gridSpan * size - size/2;
-      const z = Math.floor(i / gridSpan) / gridSpan * size - size/2;
+      // Add organic jitter to break the perfect grid
+      const jitterX = (Math.random() - 0.5) * (size / gridSpan) * 0.8;
+      const jitterZ = (Math.random() - 0.5) * (size / gridSpan) * 0.8;
+      
+      const x = (i % gridSpan) / gridSpan * size - size/2 + jitterX;
+      const z = Math.floor(i / gridSpan) / gridSpan * size - size/2 + jitterZ;
       
       pos[i*3] = x;
       pos[i*3+1] = 0;
@@ -23,6 +27,18 @@ function ParticleTerrain() {
     }
     return pos;
   }, [count]);
+
+  const circleTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const context = canvas.getContext('2d');
+    context.beginPath();
+    context.arc(16, 16, 14, 0, 2 * Math.PI);
+    context.fillStyle = '#ffffff';
+    context.fill();
+    return new THREE.CanvasTexture(canvas);
+  }, []);
 
   const mouse = useRef({ x: 0, y: 0 });
   
@@ -75,11 +91,13 @@ function ParticleTerrain() {
         />
       </bufferGeometry>
       <pointsMaterial 
-        size={0.4} 
+        size={0.25} 
         color="#2c9a6d" 
+        map={circleTexture}
         transparent 
-        opacity={0.7} 
-        sizeAttenuation={true} 
+        opacity={0.6} 
+        sizeAttenuation={true}
+        depthWrite={false}
       />
     </points>
   );
