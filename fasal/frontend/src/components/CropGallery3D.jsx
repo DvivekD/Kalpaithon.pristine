@@ -5,17 +5,9 @@ import * as THREE from 'three';
 
 // A single item on the cylinder
 function GalleryItem({ item, index, total, radius, renderCard }) {
-  // Calculate angle based on index
-  // We negate the angle so the items render in clockwise order as we drag
   const angle = -(index / total) * Math.PI * 2;
-  
-  // Position on cylinder
   const x = Math.sin(angle) * radius;
   const z = Math.cos(angle) * radius;
-  
-  // Rotation to face the center
-  // Since they are on the edge looking AT the center:
-  // Math.atan2(x, z) gives the angle. We add Math.PI so it faces inward.
   const rotationY = angle + Math.PI;
 
   return (
@@ -23,11 +15,10 @@ function GalleryItem({ item, index, total, radius, renderCard }) {
       <Html 
         transform 
         occlude="blending"
-        className="w-[320px] pointer-events-auto select-none"
-        distanceFactor={18} // This scales the HTML. Tweak if cards look too big/small.
-        position={[0, 0, 0]}
+        className="w-[350px] pointer-events-auto select-none"
+        // NO distanceFactor so it behaves 1:1 with CSS pixels
       >
-        <div className="w-full h-full transform hover:scale-[1.02] transition-transform duration-300">
+        <div className="w-full transform hover:scale-[1.02] transition-transform duration-300">
           {renderCard(item, index)}
         </div>
       </Html>
@@ -36,10 +27,14 @@ function GalleryItem({ item, index, total, radius, renderCard }) {
 }
 
 // Controller for dragging and rotating
-function GalleryCylinder({ items, radius, renderCard }) {
+function GalleryCylinder({ items, renderCard }) {
   const groupRef = useRef();
   const { gl } = useThree();
   
+  // Calculate a radius in CSS pixels
+  // Card width is 350px + some gap. Circumference = items.length * 400
+  const radius = Math.max(800, (items.length * 400) / (2 * Math.PI));
+
   // Drag physics state
   const rotation = useRef(0);
   const targetRotation = useRef(0);
@@ -47,8 +42,6 @@ function GalleryCylinder({ items, radius, renderCard }) {
   const startX = useRef(0);
 
   useEffect(() => {
-    // We attach events to the main window or canvas parent to ensure smooth dragging
-    // even if cursor leaves the canvas briefly.
     const container = gl.domElement.parentElement;
     
     const onPointerDown = (e) => {
@@ -60,7 +53,7 @@ function GalleryCylinder({ items, radius, renderCard }) {
     const onPointerMove = (e) => {
       if (!isDragging.current) return;
       const deltaX = e.clientX - startX.current;
-      targetRotation.current += deltaX * 0.005; // Pan sensitivity
+      targetRotation.current += deltaX * 0.002; // Pan sensitivity adjusted for pixel scale
       startX.current = e.clientX;
     };
     
@@ -82,11 +75,8 @@ function GalleryCylinder({ items, radius, renderCard }) {
     };
   }, [gl]);
 
-  // Apply smooth dampening
   useFrame((state, delta) => {
     if (!groupRef.current) return;
-    
-    // Lerp current rotation to target rotation
     rotation.current = THREE.MathUtils.damp(rotation.current, targetRotation.current, 5, delta);
     groupRef.current.rotation.y = rotation.current;
   });
@@ -107,26 +97,25 @@ function GalleryCylinder({ items, radius, renderCard }) {
   );
 }
 
-export default function CropGallery3D({ crops, renderCard }) {
-  // Estimate radius based on number of crops to prevent overlap.
-  // 12 crops -> radius ~9
-  // 18 crops -> radius ~13
-  const radius = Math.max(9, (crops.length * 4.5) / (2 * Math.PI));
-
+export default function CropGallery3D({ crops, renderCard, onClose }) {
   return (
-    <div className="w-full h-[650px] relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#0A1012] to-[#050809] border border-white/10 shadow-2xl">
-      {/* Overlay vignette for depth */}
-      <div className="absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_120px_rgba(0,0,0,1)]" />
-      
-      <div className="absolute top-6 left-0 w-full flex justify-center z-20 pointer-events-none">
-         <span className="bg-black/50 backdrop-blur px-4 py-2 rounded-full text-[10px] font-black tracking-widest text-white/50 border border-white/10 shadow-[0_0_15px_rgba(29,158,117,0.2)]">
-           DRAG TO EXPLORE GALLERY
+    <div className="fixed inset-0 z-[100] bg-black">
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 w-full p-6 z-20 flex justify-between items-center pointer-events-none">
+         <h2 className="text-white font-black text-xl tracking-widest uppercase">CROP_GALLERY_OS</h2>
+         <button onClick={onClose} className="pointer-events-auto bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full font-bold text-sm backdrop-blur transition-all border border-white/20">
+           Close Gallery
+         </button>
+      </div>
+
+      <div className="absolute top-20 left-0 w-full flex justify-center z-20 pointer-events-none">
+         <span className="bg-white/5 backdrop-blur px-6 py-2 rounded-full text-xs font-bold tracking-widest text-white/50 border border-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+           DRAG TO SPIN CYLINDER
          </span>
       </div>
 
       <Canvas camera={{ position: [0, 0, 0], fov: 60 }}>
-         {/* The camera is at [0,0,0] (center of cylinder). The cards wrap around. */}
-         <GalleryCylinder items={crops} radius={radius} renderCard={renderCard} />
+         <GalleryCylinder items={crops} renderCard={renderCard} />
       </Canvas>
     </div>
   );

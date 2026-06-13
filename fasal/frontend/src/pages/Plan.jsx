@@ -150,6 +150,7 @@ export default function Plan() {
   const [plantType, setPlantType] = useState('plan');
   const [profile, setProfile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [show3DGallery, setShow3DGallery] = useState(false);
 
   useEffect(() => { api.get('/profile').then(r => setProfile(r.data)).catch(() => {}); }, []);
 
@@ -323,10 +324,30 @@ export default function Plan() {
         </div>
       )}
 
-      {/* 3D Crop Gallery */}
-      <div className="mt-8">
+      {/* Crop grid (Top 4) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        {sorted.slice(0, 4).map((crop, i) => (
+          <CropCard key={crop.name} crop={crop} index={i} isRecommended={crop.name === data.recommended}
+            onSelect={handleSelect} selectedCrop={selectedCrop} />
+        ))}
+      </div>
+
+      {sorted.length > 4 && (
+        <div className="flex justify-center mt-6">
+          <button 
+            onClick={() => setShow3DGallery(true)}
+            className="px-8 py-3 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition flex items-center gap-2"
+          >
+            <Sparkles size={18} className="text-green-primary" /> Explore {sorted.length - 4} more crops in 3D Gallery
+          </button>
+        </div>
+      )}
+
+      {/* 3D Crop Gallery Overlay */}
+      {show3DGallery && (
         <CropGallery3D 
           crops={sorted} 
+          onClose={() => setShow3DGallery(false)}
           renderCard={(crop, i) => (
             <CropCard 
               key={crop.name} 
@@ -338,7 +359,7 @@ export default function Plan() {
             />
           )} 
         />
-      </div>
+      )}
 
       {/* Warning modal */}
       {warnModal && (
