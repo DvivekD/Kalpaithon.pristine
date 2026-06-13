@@ -194,6 +194,52 @@ function PhaseLegend({ weeklyNdvi, currentWeek }) {
   );
 }
 
+function toOptimizedImageDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 800;
+        const originalW = img.width;
+        const originalH = img.height;
+        const scale = Math.min(1, maxSide / Math.max(originalW, originalH));
+        const targetW = Math.max(1, Math.round(originalW * scale));
+        const targetH = Math.max(1, Math.round(originalH * scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(reader.result);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+        let quality = 0.7;
+        let output = canvas.toDataURL('image/jpeg', quality);
+
+        while (output.length > 800_000 && quality > 0.3) {
+          quality -= 0.1;
+          output = canvas.toDataURL('image/jpeg', quality);
+        }
+
+        resolve(output);
+      };
+
+      img.onerror = () => resolve(reader.result);
+      img.src = String(reader.result);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function Grow() {
   const navigate = useNavigate();
   const [timeline, setTimeline] = useState(null);
@@ -216,31 +262,34 @@ export default function Grow() {
   const handlePhotoUpload = async (weekNum, e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result;
+    if (!file.type?.startsWith('image/')) {
+      alert('Please upload a valid image file.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const base64 = await toOptimizedImageDataUrl(file);
       const newPhotos = { ...weekPhotos, [weekNum]: base64 };
       setWeekPhotos(newPhotos);
       if (timeline?.id) localStorage.setItem(`fasal_photos_${timeline.id}`, JSON.stringify(newPhotos));
 
-      // Call Gemini Vision backend
-      setIsAnalyzing(true);
-      try {
-        const res = await api.post(`/timeline/${timeline.id}/analyze`, {
-          weekNum,
-          imageBase64: base64
-        });
-        if (res.data.success) {
-          setTimeline(prev => ({ ...prev, ...res.data.timeline }));
-          // Instantly snap the UI to the newly generated branch node!
-          setDisplayWeekNum(weekNum + 1);
-        }
-      } catch (err) {
-        alert("Failed to analyze image with AI: " + (err.response?.data?.error || err.message));
+      const res = await api.post(`/timeline/${timeline.id}/analyze`, {
+        weekNum,
+        imageBase64: base64
+      });
+
+      if (res.data.success) {
+        const refreshed = await api.get('/timeline/active');
+        setTimeline(refreshed.data);
+        const nextWeek = Math.min(weekNum + 1, refreshed.data?.weeks?.length || weekNum + 1);
+        setSelectedWeek(nextWeek);
       }
+    } catch (err) {
+      alert("Failed to analyze image with AI: " + (err.response?.data?.error || err.message));
+    } finally {
       setIsAnalyzing(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   useEffect(() => {
@@ -496,6 +545,11 @@ export default function Grow() {
                     <div className="text-xs">
                       <span className="font-bold text-purple-300 block mb-1">AI Branch Generated</span>
                       <span className="text-purple-100/70 leading-relaxed">{displayWeekData.analysis_summary}</span>
+                      {displayWeekData.ai_branch?.immediate_actions?.length > 0 && (
+                        <span className="text-purple-100/70 leading-relaxed block mt-2">
+                          Next actions: {displayWeekData.ai_branch.immediate_actions.join(' | ')}
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
