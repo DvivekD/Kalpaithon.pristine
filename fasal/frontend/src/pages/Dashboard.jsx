@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sprout, Sun, TrendingUp, Clock, User, MessageCircle, LogOut, Cloud, Thermometer, Droplets, Radio } from 'lucide-react';
 import api from '../lib/api';
 import ReactiveBackground from '../components/ReactiveBackground';
+import LowPolyFarm from '../components/LowPolyFarm';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -10,11 +11,15 @@ export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [weather, setWeather] = useState(null);
   const [nextSeason, setNextSeason] = useState(null);
+  const [timeline, setTimeline] = useState(null);
+  const [iot, setIot] = useState(null);
 
   useEffect(() => {
     api.get('/profile').then(r => setProfile(r.data)).catch(() => {});
     api.get('/weather/current').then(r => setWeather(r.data)).catch(() => {});
     api.get('/predict/next-season').then(r => setNextSeason(r.data)).catch(() => {});
+    api.get('/timeline/active').then(r => setTimeline(r.data)).catch(() => {});
+    api.get('/iot/latest?device_id=fasal-node-001').then(r => setIot(r.data)).catch(() => {});
   }, []);
 
   const nav = [
@@ -97,8 +102,17 @@ export default function Dashboard() {
             </div>
           </main>
 
-          <aside className="w-80 border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden xl:block overflow-y-auto">
+          <aside className="w-[360px] border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden xl:block overflow-y-auto">
             <div className="space-y-6">
+              {/* 3D Digital Twin */}
+              <div className="mb-6">
+                <LowPolyFarm 
+                  soilMoisture={iot?.soil_moisture ?? 50} 
+                  cropProgress={timeline?.current_week && timeline?.weeks?.length ? timeline.current_week / timeline.weeks.length : 0} 
+                  isRaining={weather?.current?.condition?.toLowerCase().includes('rain') || false} 
+                />
+              </div>
+
               <div>
                 <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Sprout size={16} /> Next Season Forecast
