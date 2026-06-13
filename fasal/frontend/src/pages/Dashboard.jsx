@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sprout, Sun, TrendingUp, Clock, User, MessageCircle, LogOut, Cloud, Thermometer, Droplets, Radio } from 'lucide-react';
 import api from '../lib/api';
-import ReactiveBackground from '../components/ReactiveBackground';
 import LowPolyFarm from '../components/LowPolyFarm';
 
 export default function Dashboard() {
@@ -18,8 +17,14 @@ export default function Dashboard() {
     api.get('/profile').then(r => setProfile(r.data)).catch(() => {});
     api.get('/weather/current').then(r => setWeather(r.data)).catch(() => {});
     api.get('/predict/next-season').then(r => setNextSeason(r.data)).catch(() => {});
-    api.get('/timeline/active').then(r => setTimeline(r.data)).catch(() => {});
+    
+    const fetchTimeline = () => api.get('/timeline/active').then(r => setTimeline(r.data)).catch(() => {});
+    fetchTimeline();
+    
     api.get('/iot/latest?device_id=fasal-node-001').then(r => setIot(r.data)).catch(() => {});
+
+    window.addEventListener('fasal-timeline-updated', fetchTimeline);
+    return () => window.removeEventListener('fasal-timeline-updated', fetchTimeline);
   }, []);
 
   const nav = [
@@ -35,8 +40,7 @@ export default function Dashboard() {
   const isActive = (path) => location.pathname === path || (path === '/dashboard/plan' && location.pathname === '/dashboard');
 
   return (
-    <div className="min-h-screen flex bg-bg-primary text-text-primary overflow-hidden relative z-0 field-grid">
-      <ReactiveBackground />
+    <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-0 field-grid">
       <aside className="w-64 bg-bg-card/80 backdrop-blur-xl border-r border-border hidden md:flex flex-col min-h-screen sticky top-0">
         <div className="p-5 border-b border-border/80">
           <div className="flex items-center gap-2 mb-2">
