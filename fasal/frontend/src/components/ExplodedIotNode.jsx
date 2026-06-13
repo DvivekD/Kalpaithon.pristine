@@ -34,10 +34,10 @@ const NodeLayer = ({ position, children, label, desc, isExploded, explodeMultipl
       {children}
       {isExploded && label && (
         <Html position={[0, 0, 0]} className="pointer-events-none transition-opacity duration-300 z-50">
-          <div className="flex items-center -translate-y-1/2 translate-x-[100px] lg:translate-x-[140px]">
+          <div className="flex items-center -translate-y-1/2 -translate-x-full pr-[100px] lg:pr-[160px] relative">
             {/* Connecting line reaching back to the center [0,0,0] */}
-            <div className="w-[100px] lg:w-[140px] absolute right-full top-1/2 h-[1px] bg-green-primary/40">
-              <div className="absolute left-0 -top-[3px] w-1.5 h-1.5 rounded-full bg-green-primary shadow-[0_0_8px_rgba(44,154,109,0.8)]"></div>
+            <div className="w-[100px] lg:w-[160px] absolute right-0 top-1/2 h-[1px] bg-green-primary/40">
+              <div className="absolute right-0 -top-[3px] w-1.5 h-1.5 rounded-full bg-green-primary shadow-[0_0_8px_rgba(44,154,109,0.8)]"></div>
             </div>
             {/* The Label Box */}
             <div className="bg-[#0f1115]/95 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap pointer-events-auto">
@@ -122,12 +122,13 @@ export default function ExplodedIotNode() {
         <OrbitControls 
           enableDamping 
           dampingFactor={0.05} 
-          target={[0, 0, 0]} 
+          target={[8, 0, 0]} 
           autoRotate 
           autoRotateSpeed={0.5} 
         />
 
-        <group position={[0, 0, 0]}>
+        {/* Shift the entire node to the right side of the canvas */}
+        <group position={[8, 0, 0]}>
           
           {/* Layer 1: Top Hemisphere Shell */}
           <NodeLayer position={[0, 16, 0]} isExploded={isExploded} explodeMultiplier={val} label="Protective Shell (Top)" desc="UV-resistant drop-in casing">
