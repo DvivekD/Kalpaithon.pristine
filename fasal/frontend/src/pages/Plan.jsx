@@ -12,6 +12,19 @@ const LOADING_TEXTS = [
   "Fetching crop photos..."
 ];
 
+const FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1592982537447-6f23f739665f?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1586771107445-d3afeb0de06e?q=80&w=800&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800&auto=format&fit=crop"
+];
+
+function getFallbackImage(cropName) {
+  const hash = cropName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return FALLBACK_IMAGES[hash % FALLBACK_IMAGES.length];
+}
+
 function SuccessRing({ pct, size = 64, delay = 0 }) {
   const r = (size / 2) - 6, circ = 2 * Math.PI * r;
   const offset = circ - (pct / 100) * circ;
@@ -47,18 +60,14 @@ function CropCard({ crop, index, isRecommended, onSelect, selectedCrop }) {
       {isRecommended && <div className="h-[3px] bg-green-primary" />}
       {/* Photo */}
       <div className="h-40 sm:h-[160px] relative overflow-hidden bg-black/30">
-        {crop.photo_url || crop.photo_thumb ? (
-          <>
-            {!imgLoaded && <div className="absolute inset-0 bg-white/5 animate-pulse" />}
-            <img src={crop.photo_url || crop.photo_thumb} alt={crop.name}
-              className={`w-full h-full object-cover transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-              onLoad={() => setImgLoaded(true)} onError={(e) => { e.target.style.display = 'none'; }} />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-white/5 border-b border-white/10">
-            <span className="text-white/50 text-2xl font-bold tracking-tight">{crop.name}</span>
-          </div>
-        )}
+        {!imgLoaded && <div className="absolute inset-0 bg-white/5 animate-pulse" />}
+        <img 
+          src={crop.photo_url || crop.photo_thumb || getFallbackImage(crop.name)} 
+          alt={crop.name}
+          className={`w-full h-full object-cover transition-opacity duration-500 opacity-100`}
+          onLoad={() => setImgLoaded(true)} 
+          onError={(e) => { e.target.style.display = 'none'; }} 
+        />
         {!crop.advisable && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <span className="bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-full">NOT ADVISABLE</span>
@@ -332,16 +341,15 @@ export default function Plan() {
         ))}
       </div>
 
-      {sorted.length > 4 && (
-        <div className="flex justify-center mt-6">
-          <button 
-            onClick={() => setShow3DGallery(true)}
-            className="px-8 py-3 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition flex items-center gap-2"
-          >
-            <Sparkles size={18} className="text-green-primary" /> Explore {sorted.length - 4} more crops in 3D Gallery
-          </button>
-        </div>
-      )}
+      <div className="flex justify-center mt-6">
+        <button 
+          onClick={() => setShow3DGallery(true)}
+          className="px-8 py-3 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition flex items-center gap-2"
+        >
+          <Sparkles size={18} className="text-green-primary" /> 
+          {sorted.length > 4 ? `Explore ${sorted.length - 4} more crops in 3D Gallery` : 'Explore crops in 3D Gallery'}
+        </button>
+      </div>
 
       {/* 3D Crop Gallery Overlay */}
       {show3DGallery && (
