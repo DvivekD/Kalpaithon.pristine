@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Sprout, Sun, TrendingUp, Clock, User, MessageCircle, LogOut, Cloud, Thermometer, Droplets } from 'lucide-react';
+import { Sprout, Sun, TrendingUp, Clock, User, MessageCircle, LogOut, Cloud, Thermometer, Droplets, Radio } from 'lucide-react';
 import api from '../lib/api';
 import ReactiveBackground from '../components/ReactiveBackground';
 
@@ -23,20 +23,22 @@ export default function Dashboard() {
     { path: '/dashboard/sell', label: 'Sell', icon: <TrendingUp size={18} />, stage: 3 },
     { divider: true },
     { path: '/dashboard/history', label: 'History', icon: <Clock size={18} /> },
+    { path: '/dashboard/iot', label: 'IoT Monitor', icon: <Radio size={18} /> },
     { path: '/dashboard/profile', label: 'Profile', icon: <User size={18} /> },
   ];
 
   const isActive = (path) => location.pathname === path || (path === '/dashboard/plan' && location.pathname === '/dashboard');
 
   return (
-    <div className="min-h-screen flex bg-bg-primary text-text-primary overflow-hidden relative z-0">
+    <div className="min-h-screen flex bg-bg-primary text-text-primary overflow-hidden relative z-0 field-grid">
       <ReactiveBackground />
-      {/* Sidebar (Desktop only) */}
-      <aside className="w-60 bg-bg-card/80 backdrop-blur-xl border-r border-border hidden md:flex flex-col min-h-screen sticky top-0">
-        <div className="p-5 border-b border-border">
+      <aside className="w-64 bg-bg-card/80 backdrop-blur-xl border-r border-border hidden md:flex flex-col min-h-screen sticky top-0">
+        <div className="p-5 border-b border-border/80">
           <div className="flex items-center gap-2 mb-2">
-            <Sprout className="text-green-primary" size={24} />
-            <span className="text-lg font-bold">Fasal</span>
+            <div className="w-8 h-8 rounded-lg bg-green-primary/20 border border-green-primary/30 flex items-center justify-center">
+              <Sprout className="text-green-primary" size={18} />
+            </div>
+            <span className="hero-display text-2xl leading-none">Fasal</span>
           </div>
           {profile && (
             <div className="text-xs text-text-secondary mt-1">
@@ -50,12 +52,12 @@ export default function Dashboard() {
             <div key={i} className="my-2 mx-4 border-t border-border" />
           ) : (
             <Link key={item.path} to={item.path}
-              className={`flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg text-sm font-medium transition-all ${isActive(item.path) ? 'bg-green-primary/20 text-green-primary border border-green-primary/30 shadow-[inset_0_0_12px_rgba(29,158,117,0.1)]' : 'text-text-secondary hover:bg-white/5 hover:text-text-primary'}`}>
+              className={`flex items-center gap-3 px-5 py-2.5 mx-2 rounded-xl text-sm font-medium transition-all ${isActive(item.path) ? 'bg-green-primary/20 text-green-primary border border-green-primary/30 shadow-[inset_0_0_18px_rgba(29,158,117,0.13)]' : 'text-text-secondary hover:bg-white/5 hover:text-text-primary border border-transparent'}`}>
               {item.icon} {item.label}
             </Link>
           ))}
           <a href="https://t.me/Kisaan1207bot" target="_blank" rel="noreferrer"
-            className="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-lg text-sm font-medium text-text-secondary hover:bg-white/5 hover:text-text-primary transition-all">
+            className="flex items-center gap-3 px-5 py-2.5 mx-2 rounded-xl text-sm font-medium text-text-secondary hover:bg-white/5 hover:text-text-primary transition-all">
             <MessageCircle size={18} /> Telegram Bot
           </a>
         </nav>
@@ -70,8 +72,7 @@ export default function Dashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col relative z-0 h-screen">
-        {/* Top bar */}
-        <header className="h-14 border-b border-border bg-bg-card/80 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
+        <header className="h-16 border-b border-border bg-bg-card/75 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-10 pt-safe-top">
           <div className="flex items-center gap-3">
             <div className="md:hidden flex items-center gap-2 mr-2">
               <Sprout className="text-green-primary" size={20} />
@@ -90,16 +91,14 @@ export default function Dashboard() {
 
         {/* Content + Next Season Card */}
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
+          <main className="flex-1 p-5 md:p-8 overflow-y-auto pb-24 md:pb-8 relative">
             <div key={location.pathname} className="page-transition h-full">
               <Outlet />
             </div>
           </main>
 
-          {/* Next Season Card */}
-          <aside className="w-80 border-l border-border bg-bg-card/50 backdrop-blur-sm p-6 hidden xl:block overflow-y-auto">
+          <aside className="w-80 border-l border-border bg-bg-card/55 backdrop-blur-sm p-6 hidden xl:block overflow-y-auto">
             <div className="space-y-6">
-              {/* Next Season Prediction */}
               <div>
                 <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Sprout size={16} /> Next Season Forecast
@@ -109,7 +108,7 @@ export default function Dashboard() {
                     Complete your first season to unlock personalized recommendations.
                   </div>
                 ) : nextSeason?.suggested_crop ? (
-              <div className="space-y-3 glass-panel p-5 rounded-xl">
+              <div className="space-y-3 surface-card p-5 rounded-xl">
                 <div className="text-lg font-bold text-white">{nextSeason.suggested_crop}</div>
                 <span className={`inline-block text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border ${nextSeason.confidence === 'high' ? 'bg-green-primary/20 text-green-primary border-green-primary/30' : 'bg-amber/20 text-amber border-amber/30'}`}>
                   {nextSeason.confidence} confidence
@@ -124,32 +123,30 @@ export default function Dashboard() {
             )}
             </div>
 
-            {/* Government Schemes Infographic */}
-            <div>
-              <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2 mt-8">
-                <Sun size={16} /> Active Subsidies
-              </h3>
-              <div className="space-y-3">
-                <div className="glass-panel p-4 rounded-xl border-l-2 border-l-amber relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-all">
-                  <div className="absolute top-0 right-0 bg-amber/20 text-amber text-[10px] font-bold px-2 py-1 rounded-bl-lg">₹5000/ha</div>
-                  <h4 className="text-base font-bold text-white mb-1 pr-12">PM-KISAN</h4>
-                  <p className="text-[11px] text-text-secondary leading-relaxed">Next installment expected in 14 days. Ensure KYC is updated.</p>
-                </div>
-                
-                <div className="glass-panel p-4 rounded-xl border-l-2 border-l-green-primary relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-all">
-                  <div className="absolute top-0 right-0 bg-green-primary/20 text-green-primary text-[10px] font-bold px-2 py-1 rounded-bl-lg">80% Off</div>
-                  <h4 className="text-base font-bold text-white mb-1 pr-12">SMAM Scheme</h4>
-                  <p className="text-[11px] text-text-secondary leading-relaxed">Subsidies available for purchasing tractors and farm machinery.</p>
+              <div>
+                <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2 mt-8">
+                  <Sun size={16} /> Active Subsidies
+                </h3>
+                <div className="space-y-3">
+                  <div className="surface-card p-4 rounded-xl border-l-2 border-l-amber relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-all">
+                    <div className="absolute top-0 right-0 bg-amber/20 text-amber text-[10px] font-bold px-2 py-1 rounded-bl-lg">₹5000/ha</div>
+                    <h4 className="text-base font-bold text-white mb-1 pr-12">PM-KISAN</h4>
+                    <p className="text-[11px] text-text-secondary leading-relaxed">Next installment expected in 14 days. Ensure KYC is updated.</p>
+                  </div>
+
+                  <div className="surface-card p-4 rounded-xl border-l-2 border-l-green-primary relative overflow-hidden group cursor-pointer hover:bg-white/5 transition-all">
+                    <div className="absolute top-0 right-0 bg-green-primary/20 text-green-primary text-[10px] font-bold px-2 py-1 rounded-bl-lg">80% Off</div>
+                    <h4 className="text-base font-bold text-white mb-1 pr-12">SMAM Scheme</h4>
+                    <p className="text-[11px] text-text-secondary leading-relaxed">Subsidies available for purchasing tractors and farm machinery.</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Market Intelligence */}
-            <div>
-              <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2 mt-8">
-                <TrendingUp size={16} /> Market Insight
-              </h3>
-              <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-green-primary/10 to-transparent">
+              <div>
+                <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2 mt-8">
+                  <TrendingUp size={16} /> Market Insight
+                </h3>
+              <div className="surface-card p-5 rounded-xl bg-gradient-to-br from-green-primary/12 to-transparent">
                 <div className="flex items-end justify-between mb-3">
                   <span className="text-3xl font-black text-white">▲ 12%</span>
                   <span className="text-[11px] text-green-primary font-bold uppercase">Demand Surge</span>
@@ -164,7 +161,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 w-full glass-panel border-t border-white/10 z-50 pb-safe-bottom">
         <nav className="flex justify-around items-center p-2">
           {nav.filter(item => !item.divider).map((item, i) => (

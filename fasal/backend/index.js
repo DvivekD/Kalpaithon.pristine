@@ -10,6 +10,7 @@ import smsRoutes from './routes/sms.js';
 import sellRoutes from './routes/sell.js';
 import growRoutes from './routes/grow.js';
 import historyRoutes from './routes/history.js';
+import iotRoutes from './routes/iot.js';
 import { getWeather } from './lib/weather.js';
 
 dotenv.config();
@@ -50,6 +51,7 @@ async function authMiddleware(req, res, next) {
 
 // Public routes
 app.use('/api/auth', authRoutes);
+app.use('/api/iot', iotRoutes); // IoT sensor data (public, no auth needed)
 
 // Protected routes
 app.use('/api/profile', authMiddleware, profileRoutes);

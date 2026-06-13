@@ -10,6 +10,7 @@ import Sell from './pages/Sell';
 import History from './pages/History';
 import Profile from './pages/Profile';
 import T35Challenge from './pages/T35Challenge';
+import IoT from './pages/IoT';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
 function ProtectedRoute({ children }) {
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="sell" element={<Sell />} />
           <Route path="history" element={<History />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="iot" element={<IoT />} />
         </Route>
       </Routes>
       <LanguageSwitcher />
