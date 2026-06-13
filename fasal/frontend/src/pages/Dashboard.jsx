@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-transparent text-text-primary overflow-hidden relative z-10 field-grid">
-      <aside className="w-[220px] xl:w-[240px] bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
+      <aside className="w-56 2xl:w-60 bg-transparent backdrop-blur-sm border-r border-white/5 hidden md:flex flex-col min-h-screen sticky top-0">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded bg-transparent border border-white/10 flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
         {/* Content + Next Season Card */}
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 p-6 md:p-10 lg:p-14 overflow-y-auto pb-24 md:pb-12 relative">
+          <main className="flex-1 p-6 lg:p-8 overflow-y-auto pb-24 md:pb-12 relative">
             {/* 3D Digital Twin (Mobile/Tablet/Small Desktop View) */}
             <div className="block lg:hidden mb-6">
               <LowPolyFarm 
